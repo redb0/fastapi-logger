@@ -1,65 +1,64 @@
 """Sentry configuration."""
 import logging
-from enum import StrEnum, auto
+from enum import Enum
+from typing import Optional
 
-from pydantic import AnyHttpUrl, Field, ValidationInfo, field_validator
+from pydantic import AnyHttpUrl, Field, field_validator
 from pydantic_settings import BaseSettings
 
 
-class Environment(StrEnum):
+class Environment(str, Enum):
     """Environment options."""
-    PROD = auto()
-    PREVIEW = auto()
-    TEST = auto()
-    DEV = auto()
+    PROD = 'prod'
+    PREVIEW = 'preview'
+    TEST = 'test'
+    DEV = 'dev'
 
 
 class SentrySettings(BaseSettings):
     """Sentry configuration.
 
     Args:
-        dsn (AnyHttpUrl | None): Sentry dsn.
-        env (Environment | str | None): Environment.
+        dsn (Optional[AnyHttpUrl]): Sentry dsn.
+        env (Optional[Environment]): Environment.
         traces_sample_rate (float): Uniform sample rate.
             See. https://docs.sentry.io/platforms/python/configuration/sampling/#configuring-the-transaction-sample-rate.
-        _env_prefix (str | None): prefix of the settings for the .ini file
+        _env_prefix (Optional[str]): prefix of the settings for the .ini file
             (needed only to get rid of the listing error when using
             `Sentry Settings(_and_prefix=...)`)
 
     """
 
-    dsn: AnyHttpUrl | None = None
-    env: Environment | None = Field(default=None, alias="environment")
+    dsn: Optional[AnyHttpUrl] = None
+    env: Optional[Environment] = Field(default=None, alias='environment')
     traces_sample_rate: float = 1.0
 
     log_integration: bool = Field(default=True, exclude=True)
-    log_integration_event_level: int | None = Field(default=None, exclude=True)
-    log_integration_level: int | None = Field(default=None, exclude=True)
+    log_integration_event_level: Optional[int] = Field(default=None, exclude=True)
+    log_integration_level: Optional[int] = Field(default=None, exclude=True)
     sql_integration: bool = Field(default=True, exclude=True)
 
-    _env_prefix: str | None = None
+    _env_prefix: Optional[str] = None
 
-    @field_validator("env", mode="before")
+    @field_validator('env', mode='before')
     @classmethod
-    def _enum_upper(cls, value: str | None) -> str | None:
+    def _enum_upper(cls, value: Optional[str]) -> Optional[str]:
         if isinstance(value, str):
             value = value.lower()
         return value
 
-    @field_validator("log_integration_event_level", "log_integration_level", mode="before")
+    @field_validator('log_integration_event_level', 'log_integration_level', mode='before')
     @classmethod
-    def _set_log_level(cls, value: str | None, info: ValidationInfo) -> int | None:
-        mapping = logging.getLevelNamesMapping()
+    def _set_log_level(cls, value: Optional[str]) -> Optional[int]:
         if isinstance(value, str):
             try:
-                return mapping[value.upper()]
+                level = logging.getLevelName(value.upper())
+                if isinstance(level, int):
+                    return level
             except KeyError as error:
-                msg = (
-                    f"{info.field_name} expects one of the values "
-                    f"{', '.join(map(repr, mapping.keys()))}, got {value}"
-                )
+                msg = 'Incorrect logging level'
                 raise ValueError(msg) from error
-        return value
+        return None
 
     @property
     def is_prod(self) -> bool:

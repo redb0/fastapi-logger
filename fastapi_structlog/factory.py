@@ -1,29 +1,27 @@
 """Logger factory module."""
 from logging import Logger, getLogger
-from typing import Any, ParamSpec
+from typing import Any, Optional, Union
 
 import structlog
 
-from .types import typed_property
-
-P = ParamSpec("P")
+from fastapi_structlog.types_ import typed_property
 
 
 class LoggerFactory(structlog.stdlib.LoggerFactory):
     """Logger factory."""
-    def __init__(self,  # noqa: D107
-                 logger: Logger | str,
-                 ignore_frame_names: list[str] | None = None) -> None:
+    def __init__(self,
+                 logger: Union[Logger, str],
+                 ignore_frame_names: Optional[list[str]] = None) -> None:
         self.logger = logger
         super().__init__(ignore_frame_names=ignore_frame_names)
 
-    @typed_property[Logger, Logger | str]
+    @typed_property[Logger, Union[Logger, str]]
     def logger(self) -> Logger:
         """Get logger."""
         return self._logger
 
     @logger.setter
-    def set_value(self, logger: Logger | str) -> None:
+    def set_value(self, logger: Union[Logger, str]) -> None:
         """Set logger.
 
         `logging.getLogger` will be used if a string is passed.

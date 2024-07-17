@@ -4,7 +4,7 @@ from .current_scope import CurrentScopeSetMiddleware
 from .structlog import StructlogMiddleware
 
 __all__ = (
-    "AccessLogMiddleware",
-    "CurrentScopeSetMiddleware",
-    "StructlogMiddleware",
+    'AccessLogMiddleware',
+    'CurrentScopeSetMiddleware',
+    'StructlogMiddleware',
 )

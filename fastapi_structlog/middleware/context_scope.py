@@ -2,8 +2,8 @@
 
 from collections.abc import MutableMapping
 from contextvars import ContextVar
-from typing import Any
+from typing import Any, Optional
 
 Scope = MutableMapping[str, Any]
 
-current_scope: ContextVar[Scope | None] = ContextVar("current_scope")
+current_scope: ContextVar[Optional[Scope]] = ContextVar('current_scope')
