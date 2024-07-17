@@ -2,6 +2,7 @@
 
 from collections.abc import Collection
 from logging import Logger
+from typing import Optional, Union
 
 import structlog
 from structlog.processors import CallsiteParameter
@@ -18,7 +19,7 @@ def drop_color_message_key(
     This eliminates the need for double registration of the uvicorn
     message in the additional `color_message` field.
     """
-    _ = event_dict.pop("color_message", None)
+    _ = event_dict.pop('color_message', None)
     return event_dict
 
 
@@ -28,8 +29,8 @@ def sanitize_authorization_token(
     event_dict: EventDict,
 ) -> ProcessorReturnValue:
     """Delete the authorization token."""
-    if headers := event_dict.get("http", {}).get("headers"):
-        _ = headers.pop("authorization", None)
+    if headers := event_dict.get('http', {}).get('headers'):
+        _ = headers.pop('authorization', None)
     return event_dict
 
 
@@ -53,16 +54,16 @@ class CallsiteParameterAdderInKey(structlog.processors.CallsiteParameterAdder):
     logging parameters. An additional nesting level for this key
     will be created in `event_dict`.
     """
-    def __init__(  # noqa: D107
+    def __init__(
         self,
         parameters: Collection[CallsiteParameter] = set(CallsiteParameter),
-        additional_ignores: list[str] | None = None,
+        additional_ignores: Optional[list[str]] = None,
         *,
-        key: str | None = None,
+        key: Optional[str] = None,
     ) -> None:
         self.key = key
         additional_ignores = additional_ignores or []
-        super().__init__(parameters, [*additional_ignores, __name__.split(".")[0]])
+        super().__init__(parameters, [*additional_ignores, __name__.split('.')[0]])
 
     def __call__(self, logger: Logger, name: str, event_dict: EventDict) -> EventDict:  # noqa: D102
         event_dict = super().__call__(logger, name, event_dict)
@@ -83,7 +84,7 @@ def add_app_context() -> structlog.processors.CallsiteParameterAdder:
             structlog.processors.CallsiteParameter.FUNC_NAME,
             structlog.processors.CallsiteParameter.LINENO,
         },
-        key="source",
+        key='source',
     )
 
 
@@ -94,7 +95,7 @@ class ORJSONRenderer(structlog.processors.JSONRenderer):
     """
     def __call__(  # noqa: D102
         self, _: WrappedLogger, __: str, event_dict: EventDict,
-    ) -> str | bytes:
+    ) -> Union[str, bytes]:
         result = self._dumps(event_dict, **self._dumps_kw)
         if isinstance(result, bytes):
             return result.decode()

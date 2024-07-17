@@ -2,10 +2,12 @@
 """Module of additional types."""
 
 from collections.abc import Callable
-from typing import Any, Generic, Self, TypeVar
+from typing import Any, Generic, Optional, TypeVar, Union
 
-GetT = TypeVar("GetT")
-SetT = TypeVar("SetT")
+from typing_extensions import Self
+
+GetT = TypeVar('GetT')
+SetT = TypeVar('SetT')
 
 
 class typed_property(Generic[GetT, SetT]):
@@ -47,16 +49,16 @@ class typed_property(Generic[GetT, SetT]):
     >>> t.value = 4
     >>>     assert t.value == 4
     """
-    fget: Callable[[Any], GetT] | None
-    fset: Callable[[Any, SetT], None] | None
-    fdel: Callable[[Any], None] | None
+    fget: Optional[Callable[[Any], GetT]]
+    fset: Optional[Callable[[Any, SetT], None]]
+    fdel: Optional[Callable[[Any], None]]
 
     def __init__(
         self,
-        fget: Callable[[Any], Any] | None = None,
-        fset: Callable[[Any, Any], None] | None = None,
-        fdel: Callable[[Any], None] | None = None,
-        doc: str | None = None,
+        fget: Optional[Callable[[Any], GetT]] = None,
+        fset: Optional[Callable[[Any, SetT], None]] = None,
+        fdel: Optional[Callable[[Any], None]] = None,
+        doc: Optional[str] = None,
     ) -> None:
         self.fget = fget
         self.fset = fset
@@ -64,28 +66,28 @@ class typed_property(Generic[GetT, SetT]):
         if doc is None and fget is not None:
             doc = fget.__doc__
         self.__doc__ = doc
-        self._name = ""
+        self._name = ''
 
     def __set_name__(self, owner: Any, name: str) -> None:
         self._name = name
 
-    def __get__(self, obj: Any, objtype: Any = None) -> GetT | Self:
+    def __get__(self, obj: Any, objtype: Any = None) -> Union[GetT, Self]:
         if obj is None:
             return self
         if self.fget is None:
-            msg = f"property {self._name!r} has no getter"
+            msg = f'property {self._name!r} has no getter'
             raise AttributeError(msg)
         return self.fget(obj)
 
     def __set__(self, obj: Any, value: SetT) -> None:
         if self.fset is None:
-            msg = f"property {self._name!r} has no setter"
+            msg = f'property {self._name!r} has no setter'
             raise AttributeError(msg)
         self.fset(obj, value)
 
     def __delete__(self, obj: Any) -> None:
         if self.fdel is None:
-            msg = f"property {self._name!r} has no deleter"
+            msg = f'property {self._name!r} has no deleter'
             raise AttributeError(msg)
         self.fdel(obj)
 

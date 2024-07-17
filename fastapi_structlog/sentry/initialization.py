@@ -1,4 +1,6 @@
 """Sentry configuration module."""
+from typing import Optional
+
 import sentry_sdk
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations.fastapi import FastApiIntegration
@@ -11,11 +13,11 @@ from .settings import SentrySettings
 
 def init_sentry(
     *,
-    env_prefix: str | None = None,
-    release: str | None = None,
-    app_slug: str | None = None,
-    version: str | None = None,
-    service_integration: Integration | None = None,
+    env_prefix: Optional[str] = None,
+    release: Optional[str] = None,
+    app_slug: Optional[str] = None,
+    version: Optional[str] = None,
+    service_integration: Optional[Integration] = None,
 ) -> None:
     """Initializing Sentry with settings from the .env file or environment variables.
 
@@ -23,11 +25,11 @@ def init_sentry(
     the 'app_slug@version` format.
 
     Args:
-        env_prefix (str | None, optional): Sentry Settings prefix. Defaults to None.
-        release (str | None): Release. Defaults to None.
-        app_slug (str | None): Name of the application. Defaults to None.
-        version (str | None): Version. Defaults to None.
-        service_integration (Integration | None): Integration for inter-service
+        env_prefix (Optional[str], optional): Sentry Settings prefix. Defaults to None.
+        release (Optional[str]): Release. Defaults to None.
+        app_slug (Optional[str]): Name of the application. Defaults to None.
+        version (Optional[str]): Version. Defaults to None.
+        service_integration (Optional[Integration]): Integration for inter-service
             interaction. Defaults to None.
 
     """
@@ -35,7 +37,7 @@ def init_sentry(
     if settings_.dsn:
         setup_sentry(
             settings_,
-            release=release or f"{app_slug}@{version}",
+            release=release or f'{app_slug}@{version}',
             service_integration=service_integration,
         )
 
@@ -43,20 +45,20 @@ def init_sentry(
 def setup_sentry(
     settings_: SentrySettings,
     *,
-    release: str | None = None,
-    service_integration: Integration | None = None,
+    release: Optional[str] = None,
+    service_integration: Optional[Integration] = None,
 ) -> None:
     """Configuration of Sentry settings.
 
     Args:
         settings_ (SentrySettings): Sentry settings.
-        release (str | None, optional): Release version. Defaults to None.
-        service_integration (Integration | None): Integration for inter-service
+        release (Optional[str], optional): Release version. Defaults to None.
+        service_integration (Optional[Integration]): Integration for inter-service
             interaction. Defaults to None.
     """
     integrations: list[Integration] = [
-        StarletteIntegration(transaction_style="url"),
-        FastApiIntegration(transaction_style="url"),
+        StarletteIntegration(transaction_style='url'),
+        FastApiIntegration(transaction_style='url'),
     ]
     if settings_.log_integration:
         integrations.append(LoggingIntegration(
@@ -73,5 +75,5 @@ def setup_sentry(
         dsn=str(settings_.dsn) if settings_.dsn else None,
         release=release,
         integrations=integrations,
-        **settings_.model_dump(exclude={"dsn"}, by_alias=True),
+        **settings_.model_dump(exclude={'dsn'}, by_alias=True),
     )
