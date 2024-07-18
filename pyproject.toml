@@ -134,6 +134,9 @@ ignore = [
     "D107",
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"docs_src/*" = ["D100", "D101", "D103", "T201", "S104"]
+
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
