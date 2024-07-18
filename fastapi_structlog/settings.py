@@ -48,7 +48,7 @@ class DBSettings(_BaseModel):
 
     url: Optional[Union[str, URL]] = Field(
         default=None,
-        description='DB connection string',
+        description='Database connection string',
     )
 
     user: str = Field(
