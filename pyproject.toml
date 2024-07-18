@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-structlog"
-version = "0.2.0"
+version = "0.3.0"
 description = "Structured logs and middleware for fastapi with sentry integration"
 authors = ["Vladimir Voronov"]
 readme = "README.md"
