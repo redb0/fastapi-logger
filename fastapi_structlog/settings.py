@@ -7,7 +7,7 @@ from pydantic import Field, FilePath, SecretStr, field_validator
 from sqlalchemy.engine.url import URL
 from sqlalchemy.engine.url import make_url as make_url_
 
-from fastapi_structlog.base import _BaseModel
+from fastapi_structlog.base import BaseSettingsModel
 
 
 class LogType(Enum):
@@ -29,7 +29,7 @@ class HTTPMethod(Enum):
     HEAD = 'head'
 
 
-class SysLogSettings(_BaseModel):
+class SysLogSettings(BaseSettingsModel):
     """Syslog Server configuration."""
     host: Optional[str] = Field(
         default=None,
@@ -41,7 +41,7 @@ class SysLogSettings(_BaseModel):
     )
 
 
-class DBSettings(_BaseModel):
+class DBSettings(BaseSettingsModel):
     """Database configuration for logging."""
 
     is_async: bool = True
@@ -86,7 +86,7 @@ class DBSettings(_BaseModel):
         )
 
 
-class LogSettings(_BaseModel):
+class LogSettings(BaseSettingsModel):
     """Logging configuration.
 
     Attributes:

@@ -11,6 +11,7 @@ from typing import Optional, Union
 from sqlalchemy.engine.url import URL
 from sqlmodel import SQLModel
 
+from fastapi_structlog.base import BaseSettingsModel
 from fastapi_structlog.log import (
     DatabaseHandlerFactory,
     FileHandlerFactory,
@@ -97,4 +98,5 @@ __all__ = (
     'FileHandlerFactory',
     'HandlerFactory',
     'base_formatter',
+    'BaseSettingsModel',
 )
