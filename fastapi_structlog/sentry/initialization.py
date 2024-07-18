@@ -1,4 +1,5 @@
 """Sentry configuration module."""
+import logging
 from typing import Optional
 
 import sentry_sdk
@@ -39,6 +40,11 @@ def init_sentry(
             settings_,
             release=release or f'{app_slug}@{version}',
             service_integration=service_integration,
+        )
+    else:
+        logger = logging.getLogger('init_sentry')
+        logger.warning(
+            '\x1b[33;20mSentry is not configured! Missing DSN!\x1b[0m',
         )
 
 
