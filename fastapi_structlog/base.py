@@ -13,6 +13,7 @@ class BaseSettingsModel(BaseSettings):
         arbitrary_types_allowed=True,
         env_ignore_empty=True,
         env_nested_delimiter='__',
+        extra='ignore',
     )
 
     @model_validator(mode='before')
