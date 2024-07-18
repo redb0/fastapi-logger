@@ -2,12 +2,8 @@
 
 ### Feat
 
-- **base**: rename _BaseModel -> BaseSettingsModel
-- **sentry**: add warning for missing dsn
-
-### Fix
-
-- **init**: init logger
+- **base**: Rename _BaseModel -> BaseSettingsModel
+- **sentry**: Add warning for missing dsn
 
 ## 0.2.0 (2024-07-17)
 
@@ -15,9 +11,5 @@
 
 - **sentry**: Add sentry integration
 - **middleware**: Add logging middleware
-- **log**: Модуль логирования structlog для fastapi
-- **init**: init commit
-
-### Fix
-
-- **all**: big chanhes
+- **db_handler**: Add database handler
+- **all**: downgraded python version to 3.9
