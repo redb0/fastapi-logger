@@ -247,7 +247,7 @@ The Sentry configuration parameters are as follows:
 - `env` - The name of the environment, see `fastapi_structlog.sentry.Environment`
 - `traces_sample_rate` - [Uniform sampling rate](https://docs.sentry.io/platforms/python/configuration/sampling/#configuring-the-transaction-sample-rate)
 - `log_integration` - Flag for using logging integration, by default `True`.
-For more information, see https://docs.sentry.io/platforms/python/integrations/logging/.
+For more information, see [sentry docs](https://docs.sentry.io/platforms/python/integrations/logging/).
 - `log_integration_event_level` - Parameter `event_level` for `LoggingIntegration`, by default `None`.
 - `log_integration_level` -  - Parameter `level` for `LoggingIntegration`, by default `None`.
 - `sql_integration` - Flag for using
@@ -275,6 +275,64 @@ This parameter is intended for inter-service interaction and can be
 useful for repeated requests (for example, to track the delay before
 a repeat request, to track subqueries to other services, to monitor
 the time for data serialization, and more).
+
+## Logging into the database
+
+If you want to save logs to a database, then you need to declare a table
+model. The library provides a basic `LogModel` model that you can import as:
+
+```python
+from fastapi_structlog.db_handler import LogModel
+```
+
+This model inherits SQLModel and is a **data model**, that is, it does
+not have the `table=True` parameter. Therefore, you need to make a class
+that will inherit this model and add `table=True`. You can also add new
+fields or write your own model altogether. However, the `fastapi_structlog`
+relies on it to be the Inheritor of the `SQLModel`:
+
+```python
+class Log(LogModel, table=True):
+    """Log table."""
+```
+
+You should use one of the logger initialization functions and pass
+your model there, as well as the database connection string. This may be
+a different database from your main one.
+
+```python
+engine = create_async_engine(DB_URL)
+
+queue_listener = init_logger(
+    env_prefix='LOG__',
+    model=Log,
+    db_url=DB_URL,
+)
+
+logger = structlog.get_logger()
+```
+
+Use `lifespan` to start and stop `queue_listener`, for example:
+
+```python
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
+    async with engine.begin() as conn:
+        await conn.run_sync(Log.metadata.create_all)
+
+    if queue_listener:
+        queue_listener.start()
+
+    yield
+
+    if queue_listener:
+        queue_listener.stop()
+```
+
+You must pass `lifespan` as a parameter to the `FastAPI` class. This is the
+end of logging into the database.
+
+You can read the sample code in `docs_src/example_8.py`
 
 ## Examples
 
