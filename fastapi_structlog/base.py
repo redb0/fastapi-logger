@@ -7,7 +7,8 @@ from pydantic import BaseModel, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class _BaseModel(BaseSettings):
+class BaseSettingsModel(BaseSettings):
+    """Base model for settings."""
     model_config = SettingsConfigDict(
         arbitrary_types_allowed=True,
         env_ignore_empty=True,
