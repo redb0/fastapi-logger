@@ -1,10 +1,12 @@
 """Sentry configuration."""
 import logging
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import AnyHttpUrl, Field, field_validator
+from pydantic import AnyHttpUrl, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
+
+from fastapi_structlog.utils import check_sub_settings_unset
 
 
 class Environment(str, Enum):
@@ -68,3 +70,8 @@ class SentrySettings(BaseSettings):
             bool: ``True`` if the environment is a productive environment, otherwise ``False``
         """
         return self.env is Environment.PROD
+
+    @model_validator(mode='before')
+    @classmethod
+    def _check_sub_settings_unset(cls, values: dict[str, Any]) -> dict[str, Any]:
+        return check_sub_settings_unset(cls.model_fields, values)

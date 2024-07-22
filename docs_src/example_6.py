@@ -9,14 +9,21 @@ import structlog
 import uvicorn
 from asgi_correlation_id.middleware import CorrelationIdMiddleware
 
-from fastapi_structlog import init_logger
+from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
 from fastapi_structlog.middleware import (
     AccessLogMiddleware,
     CurrentScopeSetMiddleware,
     StructlogMiddleware,
 )
-from fastapi_structlog.sentry import init_sentry
+from fastapi_structlog.sentry import SentrySettings, setup_sentry
 
+
+class Settings(BaseSettingsModel):
+    log: LogSettings
+    sentry: SentrySettings
+
+
+settings = Settings()
 logger = structlog.get_logger()
 
 app = FastAPI(
@@ -60,8 +67,8 @@ async def test_sentry() -> str:
 
 
 def main() -> None:
-    init_logger(env_prefix='LOG__')
-    init_sentry(release='example_api@1.0')
+    setup_logger(settings.log)
+    setup_sentry(settings.sentry, release='example_api@1.0')
 
     uvicorn.run(
         app,

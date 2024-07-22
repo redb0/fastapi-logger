@@ -22,25 +22,6 @@ from fastapi_structlog.log import (
 from fastapi_structlog.settings import LogSettings, LogType
 
 
-def init_logger(
-    env_prefix: Optional[str] = None,
-    *,
-    model: Optional[type[SQLModel]] = None,
-    db_url: Optional[Union[str, URL]] = None,
-) -> Optional[logging.handlers.QueueListener]:
-    """Initialize the logger with the configuration from the .env file or environment variables.
-
-    Args:
-        env_prefix (Optional[str], optional): Prefix of the logger settings. Defaults to None.
-        model (Optional[type[SQLModel]], optional): Model to save to the database. Defaults to None.
-        db_url (Optional[Union[str, URL]], optional): Database connection string. Defaults to None.
-
-    """
-    settings_ = LogSettings(_env_prefix=env_prefix)
-
-    return setup_logger(settings_, model=model, db_url=db_url)
-
-
 def setup_logger(
     settings_: LogSettings,
     *,
@@ -89,7 +70,6 @@ def setup_logger(
 __all__ = (
     'LogSettings',
     'LogType',
-    'init_logger',
     'setup_logger',
     'LoggerConfigurator',
     'DatabaseHandlerFactory',

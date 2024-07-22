@@ -3,13 +3,13 @@ from typing import Any
 
 import structlog
 from pydantic import ValidationInfo, field_validator
-from pydantic_settings import SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
+from fastapi_structlog import LogSettings, setup_logger
 
 logger = structlog.get_logger()
 
-class Settings(BaseSettingsModel):
+class Settings(BaseSettings):
     project_name: str = 'Example API'
     app_slug: str = 'example-api'
     api_prefix: str = ''
@@ -21,6 +21,7 @@ class Settings(BaseSettingsModel):
     log: LogSettings
 
     model_config = SettingsConfigDict(
+        env_ignore_empty=True,
         env_nested_delimiter='__',
         secrets_dir='/run/secrets' if Path('/run/secrets').exists() else None,
     )

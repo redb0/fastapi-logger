@@ -10,7 +10,7 @@ from asgi_correlation_id.middleware import CorrelationIdMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine
 from starsessions import InMemoryStore, SessionAutoloadMiddleware, SessionMiddleware
 
-from fastapi_structlog import init_logger
+from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
 from fastapi_structlog.db_handler import LogModel
 from fastapi_structlog.middleware import (
     AccessLogMiddleware,
@@ -21,14 +21,21 @@ from fastapi_structlog.middleware import (
 DB_URL = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres_test'
 
 
+class Settings(BaseSettingsModel):
+    log: LogSettings
+
+
+settings = Settings()
+
+
 class Log(LogModel, table=True):
     """Log table."""
 
 
 engine = create_async_engine(DB_URL)
 
-queue_listener = init_logger(
-    env_prefix='LOG__',
+queue_listener = setup_logger(
+    settings.log,
     model=Log,
     db_url=DB_URL,
 )

@@ -5,8 +5,14 @@ from fastapi import FastAPI
 import structlog
 import uvicorn
 
-from fastapi_structlog import LogSettings, setup_logger
+from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
 
+
+class Settings(BaseSettingsModel):
+    log: LogSettings
+
+
+settings = Settings()
 logger = structlog.get_logger()
 
 app = FastAPI(title='Example API', version='1.0.0')
@@ -40,9 +46,7 @@ def error() -> str:
 
 
 def main() -> None:
-    settings_ = LogSettings(_env_prefix='LOG__')
-
-    setup_logger(settings_)
+    setup_logger(settings.log)
 
     uvicorn.run(
         app,

@@ -1,13 +1,21 @@
 """Configuration Module."""
 
 from enum import Enum
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
-from pydantic import Field, FilePath, SecretStr, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    FilePath,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
 from sqlalchemy.engine.url import URL
 from sqlalchemy.engine.url import make_url as make_url_
 
-from fastapi_structlog.base import BaseSettingsModel
+from fastapi_structlog.utils import check_sub_settings_unset
 
 
 class LogType(Enum):
@@ -29,7 +37,7 @@ class HTTPMethod(Enum):
     HEAD = 'head'
 
 
-class SysLogSettings(BaseSettingsModel):
+class SysLogSettings(BaseModel):
     """Syslog Server configuration."""
     host: Optional[str] = Field(
         default=None,
@@ -41,7 +49,7 @@ class SysLogSettings(BaseSettingsModel):
     )
 
 
-class DBSettings(BaseSettingsModel):
+class DBSettings(BaseModel):
     """Database configuration for logging."""
 
     is_async: bool = True
@@ -72,6 +80,8 @@ class DBSettings(BaseSettingsModel):
         description='Database name',
     )
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     def make_url(self) -> URL:  # noqa: D102
         if self.url:
             return make_url_(self.url)
@@ -86,7 +96,7 @@ class DBSettings(BaseSettingsModel):
         )
 
 
-class LogSettings(BaseSettingsModel):
+class LogSettings(BaseModel):
     """Logging configuration.
 
     Attributes:
@@ -147,6 +157,8 @@ class LogSettings(BaseSettingsModel):
 
     _env_prefix: Optional[str] = None
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     @field_validator('methods', mode='before')
     @classmethod
     def _create_methods(cls, value: Union[str, list[str], list[HTTPMethod]]) -> list[HTTPMethod]:
@@ -160,3 +172,8 @@ class LogSettings(BaseSettingsModel):
         if isinstance(value, str):
             return [LogType(i.strip().lower()) for i in value.strip('[]').split(',')]
         return [LogType(i.strip().lower()) if isinstance(i, str) else i for i in value]
+
+    @model_validator(mode='before')
+    @classmethod
+    def _check_sub_settings_unset(cls, values: dict[str, Any]) -> dict[str, Any]:
+        return check_sub_settings_unset(cls.model_fields, values)

@@ -5,9 +5,17 @@ from fastapi import FastAPI
 import structlog
 import uvicorn
 
-from fastapi_structlog import init_logger
-from fastapi_structlog.sentry import init_sentry
+from fastapi_structlog import BaseSettingsModel, setup_logger
+from fastapi_structlog.sentry import SentrySettings, setup_sentry
+from fastapi_structlog.settings import LogSettings
 
+
+class Settings(BaseSettingsModel):
+    log: LogSettings
+    sentry: SentrySettings
+
+
+settings = Settings()
 logger = structlog.get_logger()
 
 app = FastAPI(title='Example API', version='1.0.0')
@@ -42,8 +50,8 @@ def error() -> str:
 
 
 def main() -> None:
-    init_logger(env_prefix='LOG__')
-    init_sentry(release='example_api@1.0')
+    setup_logger(settings.log)
+    setup_sentry(settings.sentry, release='example_api@1.0')
 
     uvicorn.run(
         app,

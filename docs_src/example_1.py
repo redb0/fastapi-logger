@@ -1,8 +1,9 @@
 import os
 
 import structlog
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from fastapi_structlog import init_logger
+from fastapi_structlog import LogSettings, setup_logger
 
 os.environ['LOG__LOGGER'] = 'test-log-lib'
 # Writing to the console, disabling json mode
@@ -11,7 +12,21 @@ os.environ['LOG__JSON_LOGS'] = 'False'
 os.environ['LOG__DEBUG'] = 'True'
 os.environ['LOG__TYPES'] = '["console"]'
 
-init_logger(env_prefix='LOG__')
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        arbitrary_types_allowed=True,
+        env_ignore_empty=True,
+        env_nested_delimiter='__',
+        extra='ignore',
+    )
+    log: LogSettings
+
+
+settings = Settings()
+
+
+setup_logger(settings.log)
 
 log = structlog.get_logger()
 
