@@ -1,3 +1,9 @@
+## 0.3.4 (2024-07-22)
+
+### Fix
+
+- **settings**: refactor settings
+
 ## 0.3.3 (2024-07-19)
 
 ### Fix
