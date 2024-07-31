@@ -95,16 +95,14 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
             'method': None,
             'path': None,
             'status_code': None,
-            'logger': None,
-            'level': None,
+            'logger': record.name,
+            'level': record.levelname,
             'message': self.format(record),
         }
 
         if isinstance(record.msg, dict):
             message['request_id'] = record.msg.get('request_id')
             message['session'] = record.msg.get('session')
-            message['logger'] = record.msg.get('logger')
-            message['level'] = record.msg.get('level')
             request = cast(dict[str, Any], record.msg.get('request', {}))
 
             message['method'] = request.get('method')
@@ -123,8 +121,6 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
             message['client_address'] = message['client_address'] or record.args.get('client_addr')
             message['status_code'] = record.args.get('s')
             message['session'] = record.args.get('session')
-            message['logger'] = record.args.get('logger')
-            message['level'] = record.args.get('level')
 
         if message['session'] and '__metadata__' in message['session']:
             message['session'].pop('__metadata__')
