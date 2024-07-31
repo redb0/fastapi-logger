@@ -1,3 +1,9 @@
+## 0.3.5 (2024-07-31)
+
+### Fix
+
+- **all**: add logger name, level in model, message chenge to json
+
 ## 0.3.4 (2024-07-22)
 
 ### Fix
