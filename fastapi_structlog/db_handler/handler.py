@@ -103,13 +103,13 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
         if isinstance(record.msg, dict):
             message['request_id'] = record.msg.get('request_id')
             message['session'] = record.msg.get('session')
+            message['logger'] = record.msg.get('logger')
+            message['level'] = record.msg.get('level')
             request = cast(dict[str, Any], record.msg.get('request', {}))
 
             message['method'] = request.get('method')
             message['path'] = request.get('path')
             message['client_address'] = request.get('client_addr')
-            message['logger'] = request.get('logger')
-            message['level'] = request.get('level')
 
         if isinstance(record.args, dict):
             message['request_id'] = message['request_id'] or record.args.get('{x-request-id}i')
