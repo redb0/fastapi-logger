@@ -95,6 +95,8 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
             'method': None,
             'path': None,
             'status_code': None,
+            'logger': None,
+            'level': None,
             'message': self.format(record),
         }
 
@@ -106,6 +108,8 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
             message['method'] = request.get('method')
             message['path'] = request.get('path')
             message['client_address'] = request.get('client_addr')
+            message['logger'] = request.get('logger')
+            message['level'] = request.get('level')
 
         if isinstance(record.args, dict):
             message['request_id'] = message['request_id'] or record.args.get('{x-request-id}i')
@@ -119,6 +123,8 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
             message['client_address'] = message['client_address'] or record.args.get('client_addr')
             message['status_code'] = record.args.get('s')
             message['session'] = record.args.get('session')
+            message['logger'] = record.args.get('logger')
+            message['level'] = record.args.get('level')
 
         if message['session'] and '__metadata__' in message['session']:
             message['session'].pop('__metadata__')

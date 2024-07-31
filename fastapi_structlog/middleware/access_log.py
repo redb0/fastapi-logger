@@ -195,7 +195,8 @@ class AccessLogAtoms(dict[str, Any]):
         protocol = f"HTTP/{scope['http_version']}"
 
         status = cast(int, info['response'].get('status', 0))
-        status_phrase = HTTPStatus.get(status).phrase
+        http_status = http.HTTPStatus._value2member_map_.get(status)
+        status_phrase = '-' if http_status is None else cast(http.HTTPStatus, http_status).phrase
 
         path = scope['root_path'] + scope['path']
         full_path = get_path_with_query_string(scope)
@@ -231,6 +232,7 @@ class AccessLogAtoms(dict[str, Any]):
                 'L': f'{request_time:.6f}',
                 'p': f'<{os.getpid()}>',
                 'session': scope.get('session'),
+                'full_path': full_path,
             },
         )
 
