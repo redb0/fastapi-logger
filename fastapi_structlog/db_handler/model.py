@@ -1,9 +1,11 @@
 """Module of logging models."""
 
 import datetime
+import json
 from typing import Any, Optional
 
 import sqlalchemy as sa
+from pydantic import field_validator
 from sqlalchemy import JSON
 from sqlmodel import Field, SQLModel
 
@@ -47,7 +49,22 @@ class LogModel(SQLModel):
         default=None,
         title='Status',
     )
-    message: str = Field(
+    message: dict[str, Any] = Field(
         title='All data',
+        sa_type=sa.JSON,
+    )
+    logger: Optional[str] = Field(
+        default=None,
+        title='Logger name',
         sa_type=sa.Text,
     )
+    level: Optional[str] = Field(
+        default=None,
+        title='Level',
+        sa_type=sa.Text,
+    )
+
+    @field_validator('message', mode='before')
+    @classmethod
+    def _convert(cls, value: str) -> Any:  # noqa: ANN401
+        return json.loads(value)
