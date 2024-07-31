@@ -1,3 +1,9 @@
+## 0.3.7 (2024-07-31)
+
+### Fix
+
+- **db-handler**: fix get level and logger name
+
 ## 0.3.6 (2024-07-31)
 
 ### Fix
