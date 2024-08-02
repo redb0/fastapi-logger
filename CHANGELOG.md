@@ -1,3 +1,9 @@
+## 0.4.0 (2024-08-02)
+
+### Feat
+
+- **db_handler**: Added parameters for universal attribute search
+
 ## 0.3.7 (2024-07-31)
 
 ### Fix
