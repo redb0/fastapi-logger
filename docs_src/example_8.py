@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from fastapi import FastAPI, Request
 from starlette.middleware import Middleware
@@ -8,6 +9,7 @@ import structlog
 import uvicorn
 from asgi_correlation_id.middleware import CorrelationIdMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import Field
 from starsessions import InMemoryStore, SessionAutoloadMiddleware, SessionMiddleware
 
 from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
@@ -18,8 +20,6 @@ from fastapi_structlog.middleware import (
     StructlogMiddleware,
 )
 
-DB_URL = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres_test'
-
 
 class Settings(BaseSettingsModel):
     log: LogSettings
@@ -28,16 +28,37 @@ class Settings(BaseSettingsModel):
 settings = Settings()
 
 
-class Log(LogModel, table=True):
-    """Log table."""
+class LogWithUser(LogModel, table=True):
+    user_id: Optional[int] = Field(
+        default=None,
+        title='User ID',
+    )
+    login: Optional[str] = Field(
+        default=None,
+        title='User login',
+    )
+    login_type: Optional[str] = Field(
+        default=None,
+        title='User login type',
+    )
+    name: Optional[str] = Field(
+        default=None,
+        title='User name',
+    )
 
 
-engine = create_async_engine(DB_URL)
+engine = create_async_engine(settings.log.db.make_url())
 
 queue_listener = setup_logger(
     settings.log,
-    model=Log,
-    db_url=DB_URL,
+    model=LogWithUser,
+    db_url=settings.log.db.make_url(),
+    search_paths = {
+        'user_id': ['session', 'user_id'],
+        'login': ['session', 'username'],
+        'login_type': ['session', 'login_type'],
+        'name': ['session', 'name'],
+    },
 )
 
 logger = structlog.get_logger()
@@ -46,7 +67,7 @@ logger = structlog.get_logger()
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
     async with engine.begin() as conn:
-        await conn.run_sync(Log.metadata.create_all)
+        await conn.run_sync(LogWithUser.metadata.create_all)
 
     if queue_listener:
         queue_listener.start()
