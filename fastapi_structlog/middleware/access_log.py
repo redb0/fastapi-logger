@@ -4,99 +4,17 @@ import logging
 import os
 import sys
 import time
-from collections.abc import Callable, Iterable, Sequence
-from enum import IntEnum
+from collections.abc import Sequence
 from math import log2
-from typing import Any, Optional, Protocol, TypedDict, cast
+from typing import Any, Optional, TypedDict, cast
 
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 import structlog
-from typing_extensions import Self
 
 from fastapi_structlog.middleware.utils import get_client_addr, get_path_with_query_string
 
 from .context_scope import current_scope
-
-
-class HTTPStatusProtocol(Protocol):
-    """Protocol for listing HTTP statuses."""
-    value: int
-    name: str
-    phrase: str
-    description: str
-
-
-class HTTPStatusBase(IntEnum):
-    """Base enumeration class for HTTP statuses.
-
-    Allows you to set two additional parameters.
-    """
-    def __new__(cls, value: int, *_: tuple[Any, ...]) -> Self:  # noqa: D102
-        obj = int.__new__(cls, value)
-        obj._value_ = value
-        return obj
-
-    def __init__(self, value: int, phrase: str='', description: str='') -> None:
-        super().__init__()
-        self._value_ = value
-
-        self.phrase = phrase
-        self.description = description
-
-    @classmethod
-    def get(cls, value: int) -> Self:
-        """Get status by code.
-
-        Args:
-            value (int): HTTP code.
-
-        """
-        return cast(Self, cls._value2member_map_[value])
-
-    @classmethod
-    def _missing_(cls, value: object) -> Self:
-        if value is not None and not isinstance(value, int):
-            msg = f'The argument must be None or of type int, but not {type(value)}'
-            raise ValueError(msg)
-        value = value if value is not None else 0
-        obj = int.__new__(cls, value)
-        obj._value_ = value
-        obj._name_ = 'UNKNOWN'
-        obj.phrase = '-'
-        obj.description = ''
-        return obj
-
-
-def extend_enum_http_status(
-    parent_enum: Iterable[HTTPStatusProtocol],
-) -> Callable[[type[HTTPStatusBase]], HTTPStatusBase]:
-    """Decorator of the enumeration extension."""
-
-    def wrapper(extended_enum: type[HTTPStatusBase]) -> HTTPStatusBase:
-        """Combine two enumerations into one."""
-        joined: dict[str, tuple[int, str, str]] = {}
-        for item in parent_enum:
-            joined[item.name] = item.value, item.phrase, item.description
-        # expression has type "HTTPStatusBase", variable has type "HTTPStatusProtocol"
-        for item in extended_enum:  # type: ignore[assignment]
-            joined[item.name] = item.value, item.phrase, item.description
-        return HTTPStatusBase(extended_enum.__name__, joined)  # type: ignore[arg-type]
-
-    return wrapper
-
-
-@extend_enum_http_status(http.HTTPStatus)
-class HTTPStatus(HTTPStatusBase):
-    """Enum HTTP statuses.
-
-    Additionally, the 499 status is added when the client closes the connection.
-    """
-    CLIENT_CLOSED_REQUEST = (
-        499,
-        'Client Closed Request',
-        'Used when the client has closed the request before the server could send a response.',
-    )
 
 
 class AccessInfo(TypedDict, total=False):
@@ -108,7 +26,7 @@ class AccessInfo(TypedDict, total=False):
 
 class AccessLogMiddleware:
     """Access logging middleware."""
-    DEFAULT_FORMAT = '%(client_addr)s - "%(request_line)s" %(status_code)s %(L)ss - "%(a)s"'
+    DEFAULT_FORMAT = '%(client_addr)s - "%(request_line)s" %(status)s %(L)ss - "%(a)s"'
 
     def __init__(  # noqa: PLR0913
         self,
@@ -220,7 +138,7 @@ class AccessLogAtoms(dict[str, Any]):
                 'q': scope['query_string'].decode(),
                 'H': protocol,
                 's': status,
-                'status_code': f'{status} {status_phrase}',
+                'status': f'{status} {status_phrase}',
                 'st': status_phrase,
                 'B': self['{Content-Length}o'],
                 'b': self['{Content-Length}o'],

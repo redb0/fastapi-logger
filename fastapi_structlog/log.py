@@ -3,6 +3,7 @@ import logging
 import logging.handlers
 import sys
 from abc import abstractmethod
+from collections.abc import Callable
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 from queue import SimpleQueue
@@ -337,10 +338,13 @@ class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
             formatter = configure_formatter(shared_processors, log_renderer)
         super().__init__(DatabaseHandler, formatter)
 
-    def create_handler(
+    def create_handler(  # noqa: PLR0913
         self,
         model: Optional[type[T_]] = None,
         db_url: Optional[Union[str, URL]] = None,
+        key_aliases: Optional[dict[str, list[str]]] = None,
+        search_paths: Optional[dict[str, list[str]]] = None,
+        key_handlers: Optional[dict[str, Callable[[Any, logging.LogRecord], Any]]] = None,
         **_: Any,  # noqa: ANN401
     ) -> DatabaseHandler[T_]:
         """Create a handler."""
@@ -351,7 +355,13 @@ class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
             msg = 'The session_maker argument is required when logging into a database'
             raise ValueError(msg)
 
-        return DatabaseHandler(db_url=db_url, model=model)
+        return DatabaseHandler(
+            db_url=db_url,
+            model=model,
+            key_aliases=key_aliases,
+            search_paths=search_paths,
+            key_handlers=key_handlers,
+        )
 
 
 class LoggerConfigurator:

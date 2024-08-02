@@ -101,23 +101,34 @@ class LogSettings(BaseModel):
 
     Attributes:
         logger (str): Name of the logger
-        log_level (str): Logging level (see https://docs.python.org/3/library/logging.html#logging-levels)
+        log_level (str): Logging level
+            (see [logging docs](https://docs.python.org/3/library/logging.html#logging-levels))
         json_logs (bool): The flag that activates logging in json format,
-            by default ``True``. If the value is set to ``False``,
+            by default `True`. If the value is set to `False`,
             the logs will be adapted to `stdout`.
         traceback_as_str (bool): Logging of the traceback in string form,
-            by default ``True``. If the value is set to ``False``, the traceback
+            by default `True`. If the value is set to `False`, the traceback
             will be converted to json format. It only works when the
-            ``json_logs`` parameter is active.
+            `json_logs` parameter is active.
         filename (Path | str | None): The name of the file. It is not set by default.
         when (Literal["S", "M", "H", "D", "W"]): The interval of writing to the file.
-            See :class:`logging.handlers.TimedRotatingFileHandler`.
+            See `TimedRotatingFileHandler`
+            [docs](https://docs.python.org/3.9/library/logging.handlers.html#logging.handlers.TimedRotatingFileHandler).
         backup_count (int): The number of saved files, by default 1.
-            See :class:`logging.handlers.TimedRotatingFileHandler`.
-        debug (bool): DEBUG mode, default is ``False``. If the value is
-            set to ``True``, the DEBUG logging level will be set forcibly.
-        event_key (str): New name for the key ``event``.
-            See :class:`structlog.processors.EventRenamer`.
+            See `TimedRotatingFileHandler`
+            [docs](https://docs.python.org/3.9/library/logging.handlers.html#logging.handlers.TimedRotatingFileHandler).
+        debug (bool): DEBUG mode, default is `False`. If the value is
+            set to `True`, the DEBUG logging level will be set forcibly.
+        event_key (str): New name for the key `event`.
+            See `structlog.processors.EventRenamer`
+            [docs](https://www.structlog.org/en/stable/recipes.html).
+        enable (bool): Flag for enabling logging. Default `True`.
+        methods (list[HTTPMethod]): HTTP methods for which logging will be
+            performed. Maybe several of them `get`, `delete`, `post`, `put`,
+            `patch`, `options`, `head`. Default all.
+        types (list[LogType]): Types of logging. Maybe several of them
+            `console`, `internal`, `syslog`, `file`. Default `['console']`.
+        ttl (int): Lifetime of the logs (only for writing to the database). Default `90`.
     """
 
     logger: str = 'default'
@@ -134,7 +145,7 @@ class LogSettings(BaseModel):
     event_key: str = 'message'
 
     enable: bool = Field(
-        default=False,
+        default=True,
         description='Enable logging',
     )
     methods: list[HTTPMethod] = Field(

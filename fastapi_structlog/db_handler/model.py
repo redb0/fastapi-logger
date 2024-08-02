@@ -6,7 +6,6 @@ from typing import Any, Optional
 
 import sqlalchemy as sa
 from pydantic import field_validator
-from sqlalchemy import JSON
 from sqlmodel import Field, SQLModel
 
 
@@ -30,11 +29,6 @@ class LogModel(SQLModel):
     timestamp: datetime.datetime = Field(
         title='Date and time of the request',
     )
-    session: Optional[dict[str, Any]] = Field(
-        title='User session data',
-        default_factory=dict,
-        sa_type=JSON,
-    )
     method: Optional[str] = Field(
         default=None,
         title='HTTP method',
@@ -49,10 +43,6 @@ class LogModel(SQLModel):
         default=None,
         title='Status',
     )
-    message: dict[str, Any] = Field(
-        title='All data',
-        sa_type=sa.JSON,
-    )
     logger: Optional[str] = Field(
         default=None,
         title='Logger name',
@@ -62,6 +52,10 @@ class LogModel(SQLModel):
         default=None,
         title='Level',
         sa_type=sa.Text,
+    )
+    message: dict[str, Any] = Field(
+        title='All data',
+        sa_type=sa.JSON,
     )
 
     @field_validator('message', mode='before')

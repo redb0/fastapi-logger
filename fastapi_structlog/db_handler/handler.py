@@ -5,6 +5,7 @@ import datetime
 import logging
 import logging.handlers
 from abc import abstractmethod
+from collections.abc import Callable
 from typing import Any, Generic, Optional, TypeVar, Union, cast
 
 from sqlalchemy import create_engine
@@ -12,6 +13,8 @@ from sqlalchemy.engine.url import URL, make_url
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+from fastapi_structlog.utils import annotated_last
 
 T_ = TypeVar('T_', bound=SQLModel)
 
@@ -35,13 +38,20 @@ class BaseDatabaseHandler(logging.Handler, Generic[T_]):
         db_url: Union[str, URL],
         model: type[T_],
         level: Union[int, str] = 0,
-        loop: Optional[asyncio.AbstractEventLoop]=None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        key_aliases: Optional[dict[str, list[str]]] = None,
+        search_paths: Optional[dict[str, list[str]]] = None,
+        key_handlers: Optional[dict[str, Callable[[Any, logging.LogRecord], Any]]] = None,
     ) -> None:
         super().__init__(level)
         self.model = model
 
         self.db_url = make_url(db_url)
         self._loop = loop
+
+        self.key_aliases = key_aliases or {}
+        self.search_paths = search_paths or {}
+        self.key_handlers = key_handlers or {}
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
@@ -85,44 +95,80 @@ class BaseDatabaseHandler(logging.Handler, Generic[T_]):
 
 class DatabaseHandler(BaseDatabaseHandler[T_]):
     """Handler for logging into the database."""
-    def construct_message(self, record: logging.LogRecord) -> T_:
-        """Generate data to save to the database from LogRecord."""
-        message: dict[str, Any] = {
-            'request_id': None,
-            'client_address': None,
+
+    @staticmethod
+    def sources(record: logging.LogRecord) -> list[dict[str, Any]]:
+        sources: list[dict[str, Any]] = []
+        if isinstance(record.msg, dict):
+            sources.append(record.msg)
+            sources.append(cast(dict[str, Any], record.msg.get('request', {})))
+        if isinstance(record.args, dict):
+            sources.append(record.args)
+        return sources
+
+    def base_keys(self, record: logging.LogRecord) -> dict[str, Any]:
+        return {
             'timestamp': datetime.datetime.fromtimestamp(record.created),
-            'session': None,
-            'method': None,
-            'path': None,
-            'status_code': None,
             'logger': record.name,
             'level': record.levelname,
             'message': self.format(record),
         }
 
-        if isinstance(record.msg, dict):
-            message['request_id'] = record.msg.get('request_id')
-            message['session'] = record.msg.get('session')
-            request = cast(dict[str, Any], record.msg.get('request', {}))
+    def get_key_aliases(self) -> dict[str, list[str]]:
+        key_aliases = {
+            'request_id': ['{x-request-id}i'],
+            'method': ['m'],
+            'protocol': ['H'],
+            'path': ['full_path'],
+            'client_address': ['client_addr'],
+            'status_code': ['s'],
+        }
+        key_aliases.update(self.key_aliases)
+        return key_aliases
 
-            message['method'] = request.get('method')
-            message['path'] = request.get('path')
-            message['client_address'] = request.get('client_addr')
+    def construct_message(self, record: logging.LogRecord) -> T_:
+        """Generate data to save to the database from LogRecord."""
+        base = self.base_keys(record)
+        key_aliases = self.get_key_aliases()
 
-        if isinstance(record.args, dict):
-            message['request_id'] = message['request_id'] or record.args.get('{x-request-id}i')
-            method = record.args.get('m')
-            protocol = record.args.get('H')
-            full_path = cast(str, record.args.get('request_line'))
-            if method and protocol and full_path:
-                full_path = full_path.lstrip(method).rstrip(protocol).strip()
-            message['method'] = message['method'] or method
-            message['path'] = message['path'] or full_path
-            message['client_address'] = message['client_address'] or record.args.get('client_addr')
-            message['status_code'] = record.args.get('s')
-            message['session'] = record.args.get('session')
+        sources = self.sources(record)
 
-        if message['session'] and '__metadata__' in message['session']:
-            message['session'].pop('__metadata__')
+        data = {}
+        for name, field in self.model.model_fields.items():
+            # field is FieldInfo from sqlmodel
+            if field.primary_key is True:  # type: ignore[attr-defined]
+                continue
 
-        return self.model.model_validate(message)
+            if name in base:
+                data[name] = base[name]
+                continue
+
+            for source in sources:
+                value = None
+                if name in source:
+                    value = source[name]
+                elif name in key_aliases:
+                    aliases = key_aliases[name]
+                    for alias in aliases:
+                        if alias in source:
+                            value = source[alias]
+                            break
+                elif name in self.search_paths:
+                    data_ = source
+                    for key, is_last in annotated_last(self.search_paths[name]):
+                        if not is_last:
+                            data_ = cast(dict[str, Any], data_.get(key, {}))
+                        else:
+                            value = data_.get(key)
+
+                if value is not None:
+                    data[name] = value
+                    break
+
+            if name not in data:
+                data[name] = None
+
+            if name in self.key_handlers:
+                data[name] = self.key_handlers[name](data[name], record)
+
+        return self.model.model_validate(data)
