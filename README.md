@@ -10,13 +10,13 @@ are available for use in FastAPI applications.
 
 ## Installation
 
-You can use `poetry`:
+You can use `pip`:
 
 ```bash
 pip install fastapi-structlog
 ```
 
-or `pip`:
+or `poetry`:
 
 ```bash
 poetry add fastapi-structlog
@@ -64,7 +64,7 @@ default `D` (see [TimedRotatingFileHandler](https://docs.python.org/3/library/lo
 - Activate DEBUG mode (`DEBUG`), default `False`
 - New name for the key `event` (`EVENT_KEY`), default `message`
 (see [renaming the `event` key](https://www.structlog.org/en/stable/recipes.html#renaming-the-event-key))
-- Enable logging (`ENABLE`), default `False`
+- Enable logging (`ENABLE`), default `True`
 - Methods for logging (`METHODS`), default `["get","delete","post","put","patch","options","head"]`
 - Types of logging (`TYPES`), one of the `console`, `internal`, `syslog`, `file`, default `["console"]`
 - Number of days to store the log entry (`TTL`), default `90`
@@ -189,30 +189,31 @@ application, see example №5 (`docs_src/example_5.py`).
 
 The `AccessLogMiddleware` middleware allows the use of the following parameters:
 
-Name          | Alternative    | Description
---------------|----------------|--------------------------------------
-`h`           | `client_addr`  | Client address (`IP:PORT`)
-`r`           |                | A query string indicating the type of request and the protocol version in the format `method path protocol`
-`R`           | `request_line` | Similar to the previous one, the format `method full_path protocol`, includes query parameters
-`t`           |                | Time
-`m`           |                | Method
-`U`           |                | URL
-`q`           |                | Query parameters
-`H`           |                | Protocol
-`s`           |                | Status
-`st`          |                | Name of the status
-`status_code` |                | Status in the format `status name`
-`B`           | `b`            | [`Content-Length`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length)
-`f`           |                | [`Referer`](https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Referer)
-`a`           |                | [`User-Agent`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)
-`T`           |                | Request time (integer number of seconds)
-`M`           |                | Request time (integer number of seconds * 1000)
-`D`           |                | Request time (integer number of seconds * 1_000_000)
-`L`           |                | Request time (seconds with 6 decimal places)
-`p`           |                | Process ID
-`l`           |                | -
-`u`           |                | -
-`session`     |                | User session data
+Name        | Alternative    | Description
+------------|----------------|--------------------------------------
+`h`         | `client_addr`  | Client address (`IP:PORT`)
+`r`         |                | A query string indicating the type of request and the protocol version in the format `method path protocol`
+`R`         | `request_line` | Similar to the previous one, the format `method full_path protocol`, includes query parameters
+`t`         |                | Time
+`m`         |                | Method
+`U`         |                | URL
+`q`         |                | Query parameters
+`H`         |                | Protocol
+`s`         |                | Status
+`st`        |                | Name of the status
+`status`    |                | Status in the format `status name`
+`B`         | `b`            | [`Content-Length`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length)
+`f`         |                | [`Referer`](https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Referer)
+`a`         |                | [`User-Agent`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)
+`T`         |                | Request time (integer number of seconds)
+`M`         |                | Request time (integer number of seconds * 1000)
+`D`         |                | Request time (integer number of seconds * 1_000_000)
+`L`         |                | Request time (seconds with 6 decimal places)
+`p`         |                | Process ID
+`l`         |                | -
+`u`         |                | -
+`session`   |                | User session data
+`full_path` |                | URL with query parameters
 
 Using any parameter requires the inclusion of an expression
 in the format string `%(PARAM_NAME)s`.
