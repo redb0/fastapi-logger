@@ -188,3 +188,7 @@ class LogSettings(BaseModel):
     @classmethod
     def _check_sub_settings_unset(cls, values: dict[str, Any]) -> dict[str, Any]:
         return check_sub_settings_unset(cls.model_fields, values)
+
+    @property
+    def is_internal(self) -> bool:
+        return LogType.INTERNAL in self.types

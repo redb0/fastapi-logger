@@ -2,7 +2,7 @@
 
 import datetime
 import json
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import sqlalchemy as sa
 from pydantic import field_validator
@@ -60,5 +60,7 @@ class LogModel(SQLModel):
 
     @field_validator('message', mode='before')
     @classmethod
-    def _convert(cls, value: str) -> Any:  # noqa: ANN401
-        return json.loads(value)
+    def _convert(cls, value: Union[str, dict[str, Any]]) -> Any:  # noqa: ANN401
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
