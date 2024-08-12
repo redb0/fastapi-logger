@@ -69,13 +69,6 @@ class AccessLogMiddleware:
 
             await send(response)
 
-        request = {
-            'method': scope['method'],
-            'path': get_path_with_query_string(scope),
-            'client_addr': get_client_addr(scope),
-        }
-        structlog.contextvars.bind_contextvars(request=request)
-
         if self.session_key and self.session_key in scope:
             structlog.contextvars.bind_contextvars(session=scope.get(self.session_key))
 

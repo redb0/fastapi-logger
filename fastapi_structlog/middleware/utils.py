@@ -35,3 +35,23 @@ def get_path_with_query_string(scope: Scope) -> str:
         query_string = raw_query_string.decode('ascii')
         path_with_query_string = f'{path_with_query_string}?{query_string}'
     return path_with_query_string
+
+
+def get_user_agent(scope: Scope) -> str:
+    """Get the user agent.
+
+    Args:
+        scope (Scope): Current context.
+
+    Returns:
+        str: User-agent or '-' if it is not presented or for exceptions.
+    """
+    headers: list[tuple[bytes, bytes]] = scope.get('headers')
+    if not headers:
+        return '-'
+    user_agents = tuple(hdr[1] for hdr in headers if hdr[0] == b'user-agent')
+    try:
+        # If has multiple User-Agent, then we take the last
+        return user_agents[-1].decode('latin1')
+    except Exception:  # noqa: BLE001
+        return '-'

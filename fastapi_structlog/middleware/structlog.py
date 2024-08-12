@@ -7,6 +7,12 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 import structlog
 
+from fastapi_structlog.middleware.utils import (
+    get_client_addr,
+    get_path_with_query_string,
+    get_user_agent,
+)
+
 try:
     from asgi_correlation_id.context import correlation_id
 except ImportError:  # pragma: no cover
@@ -35,6 +41,14 @@ class StructlogMiddleware:
 
         if request_id := correlation_id.get():
             structlog.contextvars.bind_contextvars(request_id=request_id)
+
+        request = {
+            'method': scope['method'],
+            'path': get_path_with_query_string(scope),
+            'client_addr': get_client_addr(scope),
+            'user_agent': get_user_agent(scope),
+        }
+        structlog.contextvars.bind_contextvars(request=request)
 
         try:
             await self.app(scope, receive, send)
