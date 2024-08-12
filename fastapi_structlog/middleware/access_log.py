@@ -12,11 +12,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 import structlog
 
-from fastapi_structlog.middleware.utils import (
-    get_client_addr,
-    get_path_with_query_string,
-    get_user_agent,
-)
+from fastapi_structlog.middleware.utils import get_client_addr, get_path_with_query_string
 
 from .context_scope import current_scope
 
@@ -72,14 +68,6 @@ class AccessLogMiddleware:
                 info['response'] = response
 
             await send(response)
-
-        request = {
-            'method': scope['method'],
-            'path': get_path_with_query_string(scope),
-            'client_addr': get_client_addr(scope),
-            'user_agent': get_user_agent(scope),
-        }
-        structlog.contextvars.bind_contextvars(request=request)
 
         if self.session_key and self.session_key in scope:
             structlog.contextvars.bind_contextvars(session=scope.get(self.session_key))
