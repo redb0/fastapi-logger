@@ -5,7 +5,7 @@ import datetime
 import logging
 import logging.handlers
 from abc import abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any, Generic, Optional, TypeVar, Union, cast
 
 from sqlalchemy import create_engine
@@ -42,6 +42,7 @@ class BaseDatabaseHandler(logging.Handler, Generic[T_]):
         key_aliases: Optional[dict[str, list[str]]] = None,
         search_paths: Optional[dict[str, list[str]]] = None,
         key_handlers: Optional[dict[str, Callable[[Any, logging.LogRecord], Any]]] = None,
+        available_loggers: Optional[Sequence[str]] = None,
     ) -> None:
         super().__init__(level)
         self.model = model
@@ -52,6 +53,7 @@ class BaseDatabaseHandler(logging.Handler, Generic[T_]):
         self.key_aliases = key_aliases or {}
         self.search_paths = search_paths or {}
         self.key_handlers = key_handlers or {}
+        self.available_loggers = set(available_loggers) if available_loggers else set()
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
@@ -74,6 +76,9 @@ class BaseDatabaseHandler(logging.Handler, Generic[T_]):
 
     def emit(self, record: logging.LogRecord) -> None:
         """Save the message in the database."""
+        if self.available_loggers and record.name not in self.available_loggers:
+            return
+
         message = self.construct_message(record)
         if self.db_url.drivername == 'postgresql+asyncpg':
             self.loop.run_until_complete(self._async_emit(message))

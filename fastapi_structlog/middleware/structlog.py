@@ -43,7 +43,7 @@ class StructlogMiddleware:
             structlog.contextvars.bind_contextvars(request_id=request_id)
 
         request = {
-            'method': scope['method'],
+            'method': scope.get('method'),
             'path': get_path_with_query_string(scope),
             'client_addr': get_client_addr(scope),
             'user_agent': get_user_agent(scope),

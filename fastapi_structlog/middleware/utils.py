@@ -30,6 +30,8 @@ def get_path_with_query_string(scope: Scope) -> str:
     Returns:
         str: URL with query parameters
     """
+    if 'path' not in scope:
+        return '-'
     path_with_query_string = quote(scope['path'])
     if raw_query_string := scope['query_string']:
         query_string = raw_query_string.decode('ascii')
@@ -46,6 +48,8 @@ def get_user_agent(scope: Scope) -> str:
     Returns:
         str: User-agent or '-' if it is not presented or for exceptions.
     """
+    if 'headers' not in scope:
+        return '-'
     headers: list[tuple[bytes, bytes]] = scope.get('headers')
     if not headers:
         return '-'
