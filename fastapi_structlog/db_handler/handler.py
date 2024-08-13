@@ -11,6 +11,7 @@ from typing import Any, Generic, Optional, TypeVar, Union, cast
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL, make_url
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.pool import NullPool
 from sqlmodel import Session, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -86,13 +87,13 @@ class BaseDatabaseHandler(logging.Handler, Generic[T_]):
             self._sync_emit(message)
 
     async def _async_emit(self, record: T_) -> None:
-        _engine = create_async_engine(self.db_url)
+        _engine = create_async_engine(self.db_url, poolclass=NullPool)
         async with AsyncSession(bind=_engine) as session:
             session.add(record)
             await session.commit()
 
     def _sync_emit(self, record: T_) -> None:
-        _engine = create_engine(self.db_url)
+        _engine = create_engine(self.db_url, poolclass=NullPool)
         with Session(bind=_engine) as session:
             session.add(record)
             session.commit()
