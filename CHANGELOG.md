@@ -1,3 +1,11 @@
+## 0.4.2 (2024-08-13)
+
+### Fix
+
+- **middleware**: fix get key error
+- **log**: add logger name filter
+- allow newer sqlmodel version
+
 ## 0.4.1 (2024-08-02)
 
 ### Fix
