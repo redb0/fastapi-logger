@@ -59,6 +59,7 @@ queue_listener = setup_logger(
         'login_type': ['session', 'login_type'],
         'name': ['session', 'name'],
     },
+    available_loggers=['api.access'],
 )
 
 logger = structlog.get_logger()

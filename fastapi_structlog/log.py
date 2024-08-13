@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 import sys
 from abc import abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 from queue import SimpleQueue
@@ -345,6 +345,7 @@ class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
         key_aliases: Optional[dict[str, list[str]]] = None,
         search_paths: Optional[dict[str, list[str]]] = None,
         key_handlers: Optional[dict[str, Callable[[Any, logging.LogRecord], Any]]] = None,
+        available_loggers: Optional[Sequence[str]] = None,
         **_: Any,  # noqa: ANN401
     ) -> DatabaseHandler[T_]:
         """Create a handler."""
@@ -361,6 +362,7 @@ class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
             key_aliases=key_aliases,
             search_paths=search_paths,
             key_handlers=key_handlers,
+            available_loggers=available_loggers,
         )
 
 
