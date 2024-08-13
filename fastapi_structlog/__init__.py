@@ -7,7 +7,7 @@ files via pydantic.
 
 import logging
 import logging.handlers
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any, Optional, Union
 
 from sqlalchemy.engine.url import URL
@@ -32,6 +32,7 @@ def setup_logger(  # noqa: PLR0913
     key_aliases: Optional[dict[str, list[str]]] = None,
     key_handlers: Optional[dict[str, Callable[[Any, logging.LogRecord], Any]]] = None,
     search_paths: Optional[dict[str, list[str]]] = None,
+    available_loggers: Optional[Sequence[str]] = None,
 ) -> Optional[logging.handlers.QueueListener]:
     """Initialize the logger with the configuration.
 
@@ -50,6 +51,8 @@ def setup_logger(  # noqa: PLR0913
         search_paths (Optional[dict[str, list[str]]], optional): Search paths
             for model attributes. This can be useful when searching for
             attributes in nested log structures.
+        available_loggers (Optional[Sequence[str]], optional): Names of the
+            loggers that will be included in the database.
     """
     configurator = LoggerConfigurator(settings_)
     configurator.add_base_handler()
@@ -79,6 +82,7 @@ def setup_logger(  # noqa: PLR0913
                 key_aliases=key_aliases,
                 search_paths=search_paths,
                 key_handlers=key_handlers,
+                available_loggers=available_loggers
             ),
         )
 
