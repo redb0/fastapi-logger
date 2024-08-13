@@ -1,3 +1,9 @@
+## 0.4.3 (2024-08-13)
+
+### Fix
+
+- **da-handler**: fix connection error
+
 ## 0.4.2 (2024-08-13)
 
 ### Fix
