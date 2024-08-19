@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from starlette.middleware import Middleware
 
 import structlog
@@ -45,6 +45,10 @@ class LogWithUser(LogModel, table=True):
         default=None,
         title='User name',
     )
+    item_id: Optional[int] = Field(
+        default=None,
+        title='item_id',
+    )
 
 
 engine = create_async_engine(settings.log.db.make_url())
@@ -58,6 +62,7 @@ queue_listener = setup_logger(
         'login': ['session', 'username'],
         'login_type': ['session', 'login_type'],
         'name': ['session', 'name'],
+        'item_id': ['structlog_context', 'path_params', 'item_id'],
     },
     available_loggers=['api.access'],
 )
@@ -109,6 +114,11 @@ async def test(request: Request) -> str:
     request.session['username'] = 'foo_bar'
 
     return 'OK'
+
+
+@app.post('/foo/{item_id}')
+def foo(item_id: int, item: dict[str, str], bar: int = Query()) -> dict[str, str]:
+    return item | {'item_id': str(item_id), 'bar': str(bar)}
 
 
 def main() -> None:
