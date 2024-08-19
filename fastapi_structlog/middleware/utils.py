@@ -1,5 +1,6 @@
 """Auxiliary functions module."""
 
+from typing import Any, Optional
 from urllib.parse import quote
 
 from starlette.types import Scope
@@ -59,3 +60,50 @@ def get_user_agent(scope: Scope) -> str:
         return user_agents[-1].decode('latin1')
     except Exception:  # noqa: BLE001
         return '-'
+
+
+def find_path_params(
+    scope: Scope,
+    _: Optional[dict[str, Any]] = None,
+) -> Optional[dict[str, Any]]:
+    """Find path parameters."""
+    return scope.get('path_params')
+
+
+def find_api_source(
+    scope: Scope,
+    _: Optional[dict[str, Any]] = None,
+) -> Optional[dict[str, Any]]:
+    """Find location of endpoint."""
+    if 'endpoint' in scope:
+        return {
+            'package': scope['endpoint'].__globals__['__package__'],
+            'file': scope['endpoint'].__globals__['__file__'],
+            'function': scope['endpoint'].__name__,
+        }
+    return None
+
+
+def find_request_info(
+    scope: Scope,
+    _: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Find information about request."""
+    return {
+        'method': scope.get('method'),
+        'path': get_path_with_query_string(scope),
+        'client_addr': get_client_addr(scope),
+        'user_agent': get_user_agent(scope),
+    }
+
+
+def find_response_info(
+    _: Scope,
+    info: Optional[dict[str, Any]] = None,
+) -> Optional[dict[str, Any]]:
+    """Find information about response."""
+    if info:
+        return {
+            'status_code': info['response']['status'],
+        }
+    return None

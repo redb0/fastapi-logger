@@ -17,7 +17,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi_structlog.utils import annotated_last
 
+try:
+    import structlog
+except ImportError:
+    structlog = None  # type: ignore[assignment]
+
 T_ = TypeVar('T_', bound=SQLModel)
+_CONTEXT_KEY = 'structlog_context'
 
 
 class QueueHandler(logging.handlers.QueueHandler):
@@ -26,7 +32,13 @@ class QueueHandler(logging.handlers.QueueHandler):
     Removes the conversion to a string in the base class.
     """
     def emit(self, record: logging.LogRecord) -> None:  # noqa: D102
+        if structlog is not None:
+            context = structlog.contextvars.get_contextvars()
         try:
+            if isinstance(record.msg, dict):
+                record.msg[_CONTEXT_KEY] = context
+            if isinstance(record.args, dict):
+                record.args[_CONTEXT_KEY] = context
             self.enqueue(record)
         except Exception:  # noqa: BLE001
             self.handleError(record)
@@ -34,7 +46,7 @@ class QueueHandler(logging.handlers.QueueHandler):
 
 class BaseDatabaseHandler(logging.Handler, Generic[T_]):
     """Base class of the handler for logging into the database."""
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         db_url: Union[str, URL],
         model: type[T_],

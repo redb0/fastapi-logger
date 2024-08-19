@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from math import log2
 from typing import Any, Optional, TypedDict, cast
 
@@ -12,7 +12,13 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 import structlog
 
-from fastapi_structlog.middleware.utils import get_client_addr, get_path_with_query_string
+from fastapi_structlog.middleware.utils import (
+    find_api_source,
+    find_path_params,
+    find_response_info,
+    get_client_addr,
+    get_path_with_query_string,
+)
 
 from .context_scope import current_scope
 
@@ -35,12 +41,20 @@ class AccessLogMiddleware:
         logger: Optional[logging.Logger] = None,
         methods: Optional[Sequence[str]] = None,
         session_key: Optional[str] = 'session',
+        bind_func: Optional[dict[str, Callable[[Scope], Any]]] = None,
     ) -> None:
         self.app = app
         self.format = format_ or self.DEFAULT_FORMAT
         self.logger = logger or logging.getLogger('api.access')
         self.methods = set(methods) if methods else None
         self.session_key = session_key
+        if bind_func is None:
+            bind_func = {
+                'path_params': find_path_params,
+                'api_source': find_api_source,
+                'response': find_response_info,
+            }
+        self.bind_func = bind_func
 
         if not structlog.is_configured():
             self.logger.setLevel(logging.INFO)
@@ -82,10 +96,13 @@ class AccessLogMiddleware:
         finally:
             info['end_time'] = time.perf_counter()
 
-            response = {
-                'status_code': info['response']['status'],
-            }
-            structlog.contextvars.bind_contextvars(response=response)
+            _vars = {}
+            for key, func in self.bind_func.items():
+                data = func(scope)
+                if data is not None:
+                    _vars[key] = data
+            if _vars:
+                structlog.contextvars.bind_contextvars(**_vars)
 
             self.logger.info(self.format, AccessLogAtoms(scope=scope, info=info))
 
