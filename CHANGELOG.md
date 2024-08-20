@@ -1,3 +1,12 @@
+## 0.4.4 (2024-08-20)
+
+### Fix
+
+- **all**: hide password in log
+- **access_log**: fix argument passing
+- **middleware**: adding custom attribute search functions
+- **middleware**: add request when scope type is http
+
 ## 0.4.3 (2024-08-13)
 
 ### Fix
