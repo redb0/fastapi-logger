@@ -1,12 +1,29 @@
 """Log handler module."""
 
-from collections.abc import Collection
+from collections.abc import Callable, Collection
 from logging import Logger
 from typing import Optional, Union
 
 import structlog
 from structlog.processors import CallsiteParameter
 from structlog.typing import EventDict, ProcessorReturnValue, WrappedLogger
+
+from fastapi_structlog.utils import find_by_value
+
+
+def hide_query_param(
+    value_pattern: str,
+    replace_pattern: str,
+) -> Callable[[WrappedLogger, str, EventDict], ProcessorReturnValue]:
+    def hide(
+        _: WrappedLogger,
+        __: str,
+        event_dict: EventDict,
+    ) -> ProcessorReturnValue:
+        for _ in find_by_value(event_dict, value_pattern, replace=replace_pattern):
+            pass
+        return event_dict
+    return hide
 
 
 def drop_color_message_key(

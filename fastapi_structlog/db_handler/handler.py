@@ -15,7 +15,7 @@ from sqlalchemy.pool import NullPool
 from sqlmodel import Session, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from fastapi_structlog.utils import annotated_last
+from fastapi_structlog.utils import annotated_last, find_by_value
 
 try:
     import structlog
@@ -188,5 +188,12 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
 
             if name in self.key_handlers:
                 data[name] = self.key_handlers[name](data[name], record)
+
+        for _ in find_by_value(
+            data,
+            key=r'(?P<param>password=)(?P<val>.*?)(?P<end>(?:\s|&|$))',
+            replace=r'\g<param>*****\g<end>',
+        ):
+            pass
 
         return self.model.model_validate(data)
