@@ -7,11 +7,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 import structlog
 
-from fastapi_structlog.middleware.utils import (
-    get_client_addr,
-    get_path_with_query_string,
-    get_user_agent,
-)
+from fastapi_structlog.middleware.utils import find_request_info
 
 try:
     from asgi_correlation_id.context import correlation_id
@@ -26,7 +22,11 @@ class StructlogMiddleware:
 
     Adds the request ID as the `request_id` key.
     """
-    def __init__(self, app: ASGIApp, logger: Optional[logging.Logger] = None) -> None:
+    def __init__(
+        self,
+        app: ASGIApp,
+        logger: Optional[logging.Logger] = None,
+    ) -> None:
         """Initialization of the Structlog middleware.
 
         Args:
@@ -43,13 +43,7 @@ class StructlogMiddleware:
             structlog.contextvars.bind_contextvars(request_id=request_id)
 
         if scope.get('type', '').startswith('http'):
-            request = {
-                'method': scope.get('method'),
-                'path': get_path_with_query_string(scope),
-                'client_addr': get_client_addr(scope),
-                'user_agent': get_user_agent(scope),
-            }
-            structlog.contextvars.bind_contextvars(request=request)
+            structlog.contextvars.bind_contextvars(request=find_request_info(scope))
 
         try:
             await self.app(scope, receive, send)
