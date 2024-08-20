@@ -82,7 +82,7 @@ def setup_logger(  # noqa: PLR0913
                 key_aliases=key_aliases,
                 search_paths=search_paths,
                 key_handlers=key_handlers,
-                available_loggers=available_loggers
+                available_loggers=available_loggers,
             ),
         )
 

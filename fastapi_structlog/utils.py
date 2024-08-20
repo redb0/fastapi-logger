@@ -1,5 +1,7 @@
-from collections.abc import Generator, Iterable, Iterator, MutableMapping
+"""The module of auxiliary functions."""
+
 import re
+from collections.abc import Generator, Iterable, Iterator, MutableMapping
 from types import GenericAlias
 from typing import Any, Optional, TypeVar
 
@@ -13,6 +15,7 @@ def check_sub_settings_unset(
     model_fields: dict[str, FieldInfo],
     values: dict[str, Any],
 ) -> dict[str, Any]:
+    """Set empty lists as default values for the Pedantic model."""
     sub_settings_unset = []
     for name, field in model_fields.items():
         if (
@@ -29,6 +32,7 @@ def check_sub_settings_unset(
 
 
 def annotated_last(sequence: Iterable[_T]) -> Iterator[tuple[_T, bool]]:
+    """Generator that adds the flag of the last element."""
     it = iter(sequence)
     try:
         previous = next(it)
@@ -46,6 +50,7 @@ def find_by_value(
     *,
     replace: Optional[str] = None,
 ) -> Generator[Any, Any, None]:
+    """Find and replace (optionally) values in nested dictionaries."""
     pattern_re = re.compile(key)
     if hasattr(dict_, 'items'):
         for k, v in dict_.items():

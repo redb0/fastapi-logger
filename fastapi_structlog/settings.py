@@ -191,4 +191,5 @@ class LogSettings(BaseModel):
 
     @property
     def is_internal(self) -> bool:
+        """Returns True if the types have 'internal'."""
         return LogType.INTERNAL in self.types

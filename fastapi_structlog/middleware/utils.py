@@ -51,7 +51,7 @@ def get_user_agent(scope: Scope) -> str:
     """
     if 'headers' not in scope:
         return '-'
-    headers: list[tuple[bytes, bytes]] = scope.get('headers')
+    headers: list[tuple[bytes, bytes]] = scope.get('headers')  # type: ignore[assignment]
     if not headers:
         return '-'
     user_agents = tuple(hdr[1] for hdr in headers if hdr[0] == b'user-agent')

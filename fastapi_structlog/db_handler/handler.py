@@ -116,6 +116,7 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
 
     @staticmethod
     def sources(record: logging.LogRecord) -> list[dict[str, Any]]:
+        """Sources for searching for values."""
         sources: list[dict[str, Any]] = []
         if isinstance(record.msg, dict):
             sources.append(record.msg)
@@ -125,6 +126,7 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
         return sources
 
     def base_keys(self, record: logging.LogRecord) -> dict[str, Any]:
+        """Basic keys and log values."""
         return {
             'timestamp': datetime.datetime.fromtimestamp(record.created),
             'logger': record.name,
@@ -133,6 +135,7 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
         }
 
     def get_key_aliases(self) -> dict[str, list[str]]:
+        """Basic aliases for log keys."""
         key_aliases = {
             'request_id': ['{x-request-id}i'],
             'method': ['m'],
@@ -144,7 +147,7 @@ class DatabaseHandler(BaseDatabaseHandler[T_]):
         key_aliases.update(self.key_aliases)
         return key_aliases
 
-    def construct_message(self, record: logging.LogRecord) -> T_:
+    def construct_message(self, record: logging.LogRecord) -> T_:  # noqa: PLR0912, C901
         """Generate data to save to the database from LogRecord."""
         base = self.base_keys(record)
         key_aliases = self.get_key_aliases()

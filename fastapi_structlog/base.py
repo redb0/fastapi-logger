@@ -1,3 +1,5 @@
+"""Module of the basic model."""
+
 from typing import Any
 
 from pydantic import model_validator
@@ -7,6 +9,7 @@ from fastapi_structlog.utils import check_sub_settings_unset
 
 
 class BaseSettingsModel(BaseSettings):
+    """Basic model of the settings."""
     model_config = SettingsConfigDict(
         arbitrary_types_allowed=True,
         env_ignore_empty=True,

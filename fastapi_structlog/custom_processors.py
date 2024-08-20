@@ -15,6 +15,7 @@ def hide_query_param(
     value_pattern: str,
     replace_pattern: str,
 ) -> Callable[[WrappedLogger, str, EventDict], ProcessorReturnValue]:
+    """Hide the password query parameter."""
     def hide(
         _: WrappedLogger,
         __: str,
