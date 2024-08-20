@@ -41,7 +41,7 @@ class AccessLogMiddleware:
         logger: Optional[logging.Logger] = None,
         methods: Optional[Sequence[str]] = None,
         session_key: Optional[str] = 'session',
-        bind_func: Optional[dict[str, Callable[[Scope], Any]]] = None,
+        bind_func: Optional[dict[str, Callable[[Scope, Optional[dict[str, Any]]], Any]]] = None,
     ) -> None:
         self.app = app
         self.format = format_ or self.DEFAULT_FORMAT
@@ -98,7 +98,7 @@ class AccessLogMiddleware:
 
             _vars = {}
             for key, func in self.bind_func.items():
-                data = func(scope)
+                data = func(scope, info)  # type: ignore[arg-type]
                 if data is not None:
                     _vars[key] = data
             if _vars:
