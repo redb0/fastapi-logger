@@ -117,8 +117,14 @@ async def test(request: Request) -> str:
 
 
 @app.post('/foo/{item_id}')
-def foo(item_id: int, item: dict[str, str], bar: int = Query()) -> dict[str, str]:
-    return item | {'item_id': str(item_id), 'bar': str(bar)}
+def foo(
+    item_id: int,
+    item: dict[str, str],
+    bar: str = Query(),
+    password: str = Query(),
+    baz: str = Query(),
+) -> dict[str, str]:
+    return item | {'item_id': str(item_id), 'bar': bar, 'password': password, 'baz': baz}
 
 
 def main() -> None:

@@ -36,6 +36,7 @@ from fastapi_structlog.custom_processors import (
     ORJSONRenderer,
     add_app_context,
     drop_color_message_key,
+    hide_query_param,
     sanitize_authorization_token,
 )
 
@@ -72,6 +73,7 @@ def configure_processor(
     json_logs: bool = True,
     event_key: str = 'event',
     traceback_as_str: bool = True,
+    debug: bool = False,
 ) -> list[Processor]:
     """Configure the processor chain.
 
@@ -79,6 +81,8 @@ def configure_processor(
         json_logs (bool, optional): Logging in json format. Defaults to True.
         event_key (str, optional): The key of the main message. Defaults to "event".
         traceback_as_str (bool, optional): Log exceptions in string format. Defaults to True.
+        debug (bool, optional): Debugging mode. If disabled, the function
+            of hiding the password parameter query will be used.
 
     Returns:
         list[Processor]: Processor chain.
@@ -96,6 +100,13 @@ def configure_processor(
         structlog.processors.StackInfoRenderer(),
         structlog.processors.EventRenamer(to=event_key),
     ]
+    if not debug:
+        shared_processors.append(
+            hide_query_param(
+                value_pattern=r'(?P<param>password=)(?P<val>.*?)(?P<end>(?:\s|&|$))',
+                replace_pattern=r'\g<param>*****\g<end>',
+            ),
+        )
     if find_structlog_sentry:
         shared_processors.insert(3, SentryProcessor(event_level=logging.ERROR))
 
@@ -198,6 +209,7 @@ def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter
         json_logs=settings.json_logs,
         event_key=settings.event_key,
         traceback_as_str=settings.traceback_as_str,
+        debug=settings.debug,
     )
 
     log_renderer = configure_renderer(
@@ -330,6 +342,7 @@ class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
                 json_logs=True,
                 event_key='message',
                 traceback_as_str=True,
+                debug=False,
             )
             log_renderer = configure_renderer(
                 json_logs=True,
@@ -391,6 +404,7 @@ class LoggerConfigurator:
             json_logs=self.settings.json_logs,
             event_key=self.settings.event_key,
             traceback_as_str=self.settings.traceback_as_str,
+            debug=self.settings.debug,
         )
 
     @property
