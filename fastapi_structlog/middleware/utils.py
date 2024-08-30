@@ -75,11 +75,11 @@ def find_api_source(
     _: Optional[dict[str, Any]] = None,
 ) -> Optional[dict[str, Any]]:
     """Find location of endpoint."""
-    if 'endpoint' in scope:
+    if 'endpoint' in scope and hasattr(scope['endpoint'], '__globals__'):
         return {
-            'package': scope['endpoint'].__globals__['__package__'],
-            'file': scope['endpoint'].__globals__['__file__'],
-            'function': scope['endpoint'].__name__,
+            'package': scope['endpoint'].__globals__.get('__package__'),
+            'file': scope['endpoint'].__globals__.get('__file__'),
+            'function': getattr(scope['endpoint'], '__name__', None),
         }
     return None
 
