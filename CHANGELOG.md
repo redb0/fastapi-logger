@@ -1,3 +1,9 @@
+## 0.4.5 (2024-08-30)
+
+### Fix
+
+- **middleware**: fix get api source
+
 ## 0.4.4 (2024-08-20)
 
 ### Fix
