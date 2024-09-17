@@ -51,7 +51,11 @@ def error() -> str:
 
 def main() -> None:
     setup_logger(settings.log)
-    setup_sentry(settings.sentry, release='example_api@1.0')
+    setup_sentry(
+        settings.sentry,
+        release='example_api@1.0',
+        failed_request_status_codes=[range(400, 405), 422, range(500, 599)],
+    )
 
     uvicorn.run(
         app,
