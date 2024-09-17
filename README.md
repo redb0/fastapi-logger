@@ -240,7 +240,9 @@ in the `app_slug@version` format.
 Another Sentry configuration option is to use
 `fastapi_structlog.sentry.setup_sentry`. However, in this case,
 you must explicitly pass an instance of the settings
-`fastapi_structlog.sentry.SentrySettings` and the `release` parameter.
+`fastapi_structlog.sentry.SentrySettings` and the `release` parameter. In addition,
+you can pass the `failed_request_status_codes` (status codes should be reported to Sentry)
+and `service_integration` (additional Sentry integrations) parameters.
 
 The Sentry configuration parameters are as follows:
 

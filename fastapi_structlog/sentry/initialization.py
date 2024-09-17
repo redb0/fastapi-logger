@@ -1,6 +1,6 @@
 """Sentry configuration module."""
 import logging
-from typing import Optional
+from typing import Optional, Union
 
 import sentry_sdk
 from sentry_sdk.integrations import Integration
@@ -19,6 +19,7 @@ def setup_sentry(
     app_slug: Optional[str] = None,
     version: Optional[str] = None,
     service_integration: Optional[Integration] = None,
+    failed_request_status_codes: Optional[list[Union[int, range]]] = None,
 ) -> None:
     """Configuration of Sentry settings.
 
@@ -29,6 +30,10 @@ def setup_sentry(
         version (Optional[str]): Version. Defaults to None.
         service_integration (Optional[Integration]): Integration for inter-service
             interaction. Defaults to None.
+        failed_request_status_codes (Optional[list[Union[int, range]]]): A list of integers or
+            containers (objects that allow membership checks via in) of integers that will determine
+            which status codes should be reported to Sentry.
+            See https://docs.sentry.io/platforms/python/integrations/starlette/
     """
     release = release or f'{app_slug}@{version}'
 
@@ -39,9 +44,16 @@ def setup_sentry(
         )
         return
 
+    failed_request_status_codes = failed_request_status_codes or [range(500, 599)]
     integrations: list[Integration] = [
-        StarletteIntegration(transaction_style='url'),
-        FastApiIntegration(transaction_style='url'),
+        StarletteIntegration(
+            transaction_style='url',
+            failed_request_status_codes=failed_request_status_codes,
+        ),
+        FastApiIntegration(
+            transaction_style='url',
+            failed_request_status_codes=failed_request_status_codes,
+        ),
     ]
     if settings_.log_integration:
         integrations.append(LoggingIntegration(
