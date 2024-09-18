@@ -1,5 +1,6 @@
 """Sentry configuration module."""
 import logging
+from collections.abc import Container
 from typing import Optional, Union
 
 import sentry_sdk
@@ -12,14 +13,14 @@ from sentry_sdk.integrations.starlette import StarletteIntegration
 from .settings import SentrySettings
 
 
-def setup_sentry(
+def setup_sentry(  # noqa: PLR0913
     settings_: SentrySettings,
     *,
     release: Optional[str] = None,
     app_slug: Optional[str] = None,
     version: Optional[str] = None,
     service_integration: Optional[Integration] = None,
-    failed_request_status_codes: Optional[list[Union[int, range]]] = None,
+    failed_request_status_codes: Optional[list[Union[int, Container[int]]]] = None,
 ) -> None:
     """Configuration of Sentry settings.
 
@@ -30,10 +31,10 @@ def setup_sentry(
         version (Optional[str]): Version. Defaults to None.
         service_integration (Optional[Integration]): Integration for inter-service
             interaction. Defaults to None.
-        failed_request_status_codes (Optional[list[Union[int, range]]]): A list of integers or
-            containers (objects that allow membership checks via in) of integers that will determine
-            which status codes should be reported to Sentry.
-            See https://docs.sentry.io/platforms/python/integrations/starlette/
+        failed_request_status_codes (Optional[list[Union[int, Container[int]]]]): A list
+            of integers or containers (objects that allow membership checks via in)
+            of integers that will determine which status codes should be reported
+            to Sentry. See https://docs.sentry.io/platforms/python/integrations/starlette/
     """
     release = release or f'{app_slug}@{version}'
 
