@@ -1,3 +1,13 @@
+## 0.5.0 (2024-09-18)
+
+### Feat
+
+- **sentry**: Added the ability to customize failed status codes during Sentry setup.
+
+### Fix
+
+- **sentry**: fix typing
+
 ## 0.4.5 (2024-08-30)
 
 ### Fix
