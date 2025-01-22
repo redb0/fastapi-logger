@@ -5,9 +5,9 @@ description = "Structured logs and middleware for fastapi with sentry integratio
 authors = ["Vladimir Voronov"]
 readme = "README.md"
 package-mode = true
-packages = [
-    { include = "fastapi_structlog" },
-]
+packages = [{ include = "fastapi_structlog" }]
+homepage = "https://github.com/redb0/fastapi-logger"
+
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -88,48 +88,48 @@ target-version = "py39"
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "N",  # pep8-naming
-    "D",  # pydocstyle
-    "A",  # flake8-builtins
-    "S",  # flake8-bandit
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
-    "Q",  # flake8-quotes
-    "PL", # pylint
-    "UP",  # pyupgrade
-    "C4",  # flake8-comprehensions
-    "EM",  # flake8-errmsg
-    "PT",  # flake8-pytest-style
-    "TD",  # flake8-todos
-    "FBT",  # flake8-boolean-trap
-    "ANN",  # flake8-annotations
-    "BLE",  # flake8-blind-except
-    "COM",  # flake8-commas
-    "ISC",  # flake8-implicit-str-concat
-    "ICN",  # flake8-import-conventions
-    "PIE",  # flake8-pie
-    "T20",  # flake8-print
-    "PYI",  # flake8-pyi
-    "RSE",  # flake8-raise
-    "RET",  # flake8-return
-    "SIM",  # flake8-simplify
-    "PTH",  # flake8-use-pathlib
-    "TID",  # flake8-tidy-imports
-    "TCH",  # flake8-type-checking
-    "ARG",  # flake8-unused-arguments
-    "ERA",  # eradicate
-    "PGH",  # pygrep-hooks
-    "RUF",  # Ruff-specific rules
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "N",     # pep8-naming
+    "D",     # pydocstyle
+    "A",     # flake8-builtins
+    "S",     # flake8-bandit
+    "C",     # flake8-comprehensions
+    "B",     # flake8-bugbear
+    "Q",     # flake8-quotes
+    "PL",    # pylint
+    "UP",    # pyupgrade
+    "C4",    # flake8-comprehensions
+    "EM",    # flake8-errmsg
+    "PT",    # flake8-pytest-style
+    "TD",    # flake8-todos
+    "FBT",   # flake8-boolean-trap
+    "ANN",   # flake8-annotations
+    "BLE",   # flake8-blind-except
+    "COM",   # flake8-commas
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "PIE",   # flake8-pie
+    "T20",   # flake8-print
+    "PYI",   # flake8-pyi
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SIM",   # flake8-simplify
+    "PTH",   # flake8-use-pathlib
+    "TID",   # flake8-tidy-imports
+    "TCH",   # flake8-type-checking
+    "ARG",   # flake8-unused-arguments
+    "ERA",   # eradicate
+    "PGH",   # pygrep-hooks
+    "RUF",   # Ruff-specific rules
     "PERF",  # Perflint
-    "ASYNC",  # flake8-async
+    "ASYNC", # flake8-async
 ]
 ignore = [
-    "ANN102",  # annotation for cls
-    "ANN101",  # annotation for self
+    "ANN102", # annotation for cls
+    "ANN101", # annotation for self
     "D104",
     "D107",
 ]
@@ -158,7 +158,7 @@ section-order = [
     "fastapi",
     "third-party",
     "first-party",
-    "local-folder"
+    "local-folder",
 ]
 
 [tool.ruff.lint.isort.sections]
@@ -181,9 +181,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.mypy]
-plugins = [
-  "pydantic.mypy"
-]
+plugins = ["pydantic.mypy"]
 show_traceback = true
 strict = true
 mypy_path = "fastapi_structlog/"
