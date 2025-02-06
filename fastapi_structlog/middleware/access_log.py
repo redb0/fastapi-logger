@@ -8,6 +8,7 @@ from collections.abc import Callable, Sequence
 from math import log2
 from typing import Any, Optional, TypedDict, cast
 
+from fastapi.routing import APIRoute
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 import structlog
@@ -133,6 +134,10 @@ class AccessLogAtoms(dict[str, Any]):
 
         request_time = info['end_time'] - info['start_time']
         client_addr = get_client_addr(scope)
+        route = scope.get('route')
+        if not isinstance(route, APIRoute):
+            route = None
+
         self.update(
             {
                 'h': client_addr,
@@ -161,6 +166,8 @@ class AccessLogAtoms(dict[str, Any]):
                 'p': f'<{os.getpid()}>',
                 'session': scope.get('session'),
                 'full_path': full_path,
+                'r_summary': route.summary if route else '',
+                'r_description': route.description if route else '',
             },
         )
 
