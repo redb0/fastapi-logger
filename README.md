@@ -189,31 +189,33 @@ application, see example №5 (`docs_src/example_5.py`).
 
 The `AccessLogMiddleware` middleware allows the use of the following parameters:
 
-Name        | Alternative    | Description
-------------|----------------|--------------------------------------
-`h`         | `client_addr`  | Client address (`IP:PORT`)
-`r`         |                | A query string indicating the type of request and the protocol version in the format `method path protocol`
-`R`         | `request_line` | Similar to the previous one, the format `method full_path protocol`, includes query parameters
-`t`         |                | Time
-`m`         |                | Method
-`U`         |                | URL
-`q`         |                | Query parameters
-`H`         |                | Protocol
-`s`         |                | Status
-`st`        |                | Name of the status
-`status`    |                | Status in the format `status name`
-`B`         | `b`            | [`Content-Length`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length)
-`f`         |                | [`Referer`](https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Referer)
-`a`         |                | [`User-Agent`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)
-`T`         |                | Request time (integer number of seconds)
-`M`         |                | Request time (integer number of seconds * 1000)
-`D`         |                | Request time (integer number of seconds * 1_000_000)
-`L`         |                | Request time (seconds with 6 decimal places)
-`p`         |                | Process ID
-`l`         |                | -
-`u`         |                | -
-`session`   |                | User session data
-`full_path` |                | URL with query parameters
+Name            | Alternative    | Description
+----------------|----------------|--------------------------------------
+`h`             | `client_addr`  | Client address (`IP:PORT`)
+`r`             |                | A query string indicating the type of request and the protocol version in the format `method path protocol`
+`R`             | `request_line` | Similar to the previous one, the format `method full_path protocol`, includes query parameters
+`t`             |                | Time
+`m`             |                | Method
+`U`             |                | URL
+`q`             |                | Query parameters
+`H`             |                | Protocol
+`s`             |                | Status
+`st`            |                | Name of the status
+`status`        |                | Status in the format `status name`
+`B`             | `b`            | [`Content-Length`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length)
+`f`             |                | [`Referer`](https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Referer)
+`a`             |                | [`User-Agent`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)
+`T`             |                | Request time (integer number of seconds)
+`M`             |                | Request time (integer number of seconds * 1000)
+`D`             |                | Request time (integer number of seconds * 1_000_000)
+`L`             |                | Request time (seconds with 6 decimal places)
+`p`             |                | Process ID
+`l`             |                | -
+`u`             |                | -
+`session`       |                | User session data
+`full_path`     |                | URL with query parameters
+`r_summary`     |                | [`summary` field from APIRoute](https://fastapi.tiangolo.com/tutorial/path-operation-configuration/#summary-and-description)
+`r_description` |                | [`description` field from APIRoute](https://fastapi.tiangolo.com/tutorial/path-operation-configuration/#summary-and-description)
 
 Using any parameter requires the inclusion of an expression
 in the format string `%(PARAM_NAME)s`.
