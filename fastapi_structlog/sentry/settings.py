@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import AnyHttpUrl, Field, field_validator, model_validator
+from pydantic import AliasChoices, AnyHttpUrl, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
 
 from fastapi_structlog.utils import check_sub_settings_unset
@@ -32,7 +32,11 @@ class SentrySettings(BaseSettings):
     """
 
     dsn: Optional[AnyHttpUrl] = None
-    env: Optional[Environment] = Field(default=None, alias='environment')
+    env: Optional[Environment] = Field(
+        default=Environment.DEV,
+        alias='environment',
+        validation_alias=AliasChoices('env', 'environment'),
+    )
     traces_sample_rate: float = 1.0
 
     log_integration: bool = Field(default=True, exclude=True)
