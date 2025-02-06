@@ -1,3 +1,13 @@
+## 0.6.0 (2025-02-06)
+
+### Feat
+
+- **access-log**: add log field summary and description from APIRoute
+
+### Fix
+
+- **sentry**: add alias for env attr
+
 ## 0.5.0 (2024-09-18)
 
 ### Feat

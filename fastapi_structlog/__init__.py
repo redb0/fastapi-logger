@@ -92,6 +92,9 @@ def setup_logger(  # noqa: PLR0913
     return configurator.setup()
 
 
+__version__ = '0.6.0'
+
+
 __all__ = (
     'LogSettings',
     'LogType',
