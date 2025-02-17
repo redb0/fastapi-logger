@@ -1,25 +1,52 @@
-[tool.poetry]
+[project]
 name = "fastapi-structlog"
 version = "0.6.0"
 description = "Structured logs and middleware for fastapi with sentry integration"
-authors = ["Vladimir Voronov"]
+license = { text = "MIT" }
 readme = "README.md"
+requires-python = ">=3.9,<4.0.0"
+authors = [
+    { name = "Vladimir Voronov", email="voronov.volodya2013@yandex.ru" },
+]
+keywords = [ "fastapi", "structlog", "logging" ]
+dynamic = [ "classifiers" ]
+dependencies = [
+    "pydantic (>=2.10.6,<3.0.0)",
+    "structlog (>=25.1.0,<26.0.0)",
+    "orjson (>=3.10.15,<4.0.0)",
+    "structlog-sentry (>=2.2.1,<3.0.0)",
+    "rich (>=13.9.4,<14.0.0)",
+    "pydantic-settings (>=2.7.1,<3.0.0)",
+    "asgi-correlation-id (>=4.3.4,<5.0.0)",
+    "sentry-sdk (>=2.21.0,<3.0.0)",
+    "sqlmodel (>=0.0.22,<0.0.23)"
+]
+
+
+[project.urls]
+homepage = "https://github.com/redb0/fastapi-logger"
+repository = "https://github.com/redb0/fastapi-logger"
+
+
+[tool.poetry]
 package-mode = true
 packages = [{ include = "fastapi_structlog" }]
-homepage = "https://github.com/redb0/fastapi-logger"
-
-
-[tool.poetry.dependencies]
-python = "^3.9"
-pydantic = "^2.8.2"
-structlog = "^24.2.0"
-orjson = "^3.10.6"
-structlog-sentry = "^2.1.0"
-rich = "^13.7.1"
-pydantic-settings = "^2.3.4"
-asgi-correlation-id = "^4.3.1"
-sentry-sdk = "^2.9.0"
-sqlmodel = ">=0.0.19,<0.1.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Framework :: FastAPI",
+    "Topic :: Internet",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development",
+    "Topic :: System :: Logging",
+]
 
 
 [tool.poetry.group.linter.dependencies]
@@ -85,68 +112,33 @@ exclude = [
     "venv",
 ]
 
-line-length = 100
-target-version = "py39"
-
-[tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
-select = [
-    "E",     # pycodestyle errors
-    "W",     # pycodestyle warnings
-    "F",     # pyflakes
-    "I",     # isort
-    "N",     # pep8-naming
-    "D",     # pydocstyle
-    "A",     # flake8-builtins
-    "S",     # flake8-bandit
-    "C",     # flake8-comprehensions
-    "B",     # flake8-bugbear
-    "Q",     # flake8-quotes
-    "PL",    # pylint
-    "UP",    # pyupgrade
-    "C4",    # flake8-comprehensions
-    "EM",    # flake8-errmsg
-    "PT",    # flake8-pytest-style
-    "TD",    # flake8-todos
-    "FBT",   # flake8-boolean-trap
-    "ANN",   # flake8-annotations
-    "BLE",   # flake8-blind-except
-    "COM",   # flake8-commas
-    "ISC",   # flake8-implicit-str-concat
-    "ICN",   # flake8-import-conventions
-    "PIE",   # flake8-pie
-    "T20",   # flake8-print
-    "PYI",   # flake8-pyi
-    "RSE",   # flake8-raise
-    "RET",   # flake8-return
-    "SIM",   # flake8-simplify
-    "PTH",   # flake8-use-pathlib
-    "TID",   # flake8-tidy-imports
-    "TCH",   # flake8-type-checking
-    "ARG",   # flake8-unused-arguments
-    "ERA",   # eradicate
-    "PGH",   # pygrep-hooks
-    "RUF",   # Ruff-specific rules
-    "PERF",  # Perflint
-    "ASYNC", # flake8-async
-]
+select = ["ALL"]
 ignore = [
-    "ANN102", # annotation for cls
-    "ANN101", # annotation for self
     "D104",
     "D107",
 ]
+line-length = 100
+# target-version = "py39"
+
+
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true
 
 [tool.ruff.lint.per-file-ignores]
 "docs_src/*" = ["D100", "D101", "D103", "T201", "S104"]
+
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
 
+
 [tool.ruff.lint.pylint]
 max-args = 5
 max-positional-args = 3
+
 
 [tool.pylint]
 disable = "all"
@@ -167,30 +159,29 @@ section-order = [
 [tool.ruff.lint.isort.sections]
 "fastapi" = ["fastapi", "starlette"]
 
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "single"
-
 # Like Black, indent with spaces, rather than tabs.
 indent-style = "space"
-
 # Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
-
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
 
+
 [tool.mypy]
+# python_version = "3.9"
 plugins = ["pydantic.mypy"]
 show_traceback = true
 strict = true
 mypy_path = "fastapi_structlog/"
-
 # Display the codes needed for # type: ignore[code] annotations.
 show_error_codes = true
-
 # Warn of unreachable or redundant code.
 warn_unreachable = true

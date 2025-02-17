@@ -20,6 +20,7 @@ from fastapi_structlog.utils import check_sub_settings_unset
 
 class LogType(Enum):
     """Type of logging."""
+
     CONSOLE = 'console'
     INTERNAL = 'internal'
     SYSLOG = 'syslog'
@@ -28,6 +29,7 @@ class LogType(Enum):
 
 class HTTPMethod(Enum):
     """HTTP methods."""
+
     GET = 'get'
     DELETE = 'delete'
     POST = 'post'
@@ -39,6 +41,7 @@ class HTTPMethod(Enum):
 
 class SysLogSettings(BaseModel):
     """Syslog Server configuration."""
+
     host: Optional[str] = Field(
         default=None,
         description='Syslog server address',
@@ -89,7 +92,7 @@ class DBSettings(BaseModel):
         return URL.create(
             drivername='asyncpg' if self.is_async else 'psycopg2',
             username=self.user,
-            password=self.password._secret_value if self.password else None,
+            password=self.password.get_secret_value() if self.password else None,
             host=self.host,
             port=self.port,
             database=self.name,
@@ -149,7 +152,7 @@ class LogSettings(BaseModel):
         description='Enable logging',
     )
     methods: list[HTTPMethod] = Field(
-        default=[i.value for i in HTTPMethod],
+        default=list(HTTPMethod),
         description='Log messages in a structured format',
     )
     types: list[LogType] = Field(
@@ -158,9 +161,7 @@ class LogSettings(BaseModel):
     )
     ttl: int = Field(
         default=90,
-        description=(
-            'Number of days to store the log entry. Applies only to the Internal type'
-        ),
+        description='Number of days to store the log entry. Applies only to the Internal type',
     )
 
     syslog: SysLogSettings

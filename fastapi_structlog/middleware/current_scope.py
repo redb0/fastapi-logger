@@ -1,4 +1,5 @@
 """Middleware module for adding the current context."""
+
 from contextvars import ContextVar
 from typing import Optional
 
@@ -9,6 +10,7 @@ from .context_scope import current_scope
 
 class CurrentScopeSetMiddleware:
     """Middleware that adds the current context."""
+
     def __init__(
         self,
         app: ASGIApp,

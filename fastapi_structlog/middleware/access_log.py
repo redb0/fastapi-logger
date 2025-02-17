@@ -1,4 +1,5 @@
 """Access logging middleware module."""
+
 import http
 import logging
 import os
@@ -26,6 +27,7 @@ from .context_scope import current_scope
 
 class AccessInfo(TypedDict, total=False):
     """Access information with timestamps."""
+
     response: Message
     start_time: float
     end_time: float
@@ -33,6 +35,7 @@ class AccessInfo(TypedDict, total=False):
 
 class AccessLogMiddleware:
     """Access logging middleware."""
+
     DEFAULT_FORMAT = '%(client_addr)s - "%(request_line)s" %(status)s %(L)ss - "%(a)s"'
 
     def __init__(  # noqa: PLR0913
@@ -91,9 +94,9 @@ class AccessLogMiddleware:
             info['start_time'] = time.perf_counter()
             await self.app(scope, receive, send_wrapper)
             return
-        except Exception as exc:
+        except Exception:
             info['response']['status'] = 500
-            raise exc
+            raise
         finally:
             info['end_time'] = time.perf_counter()
 
@@ -110,6 +113,7 @@ class AccessLogMiddleware:
 
 class AccessLogAtoms(dict[str, Any]):
     """Logging attributes."""
+
     def __init__(self, scope: Scope, info: AccessInfo) -> None:
         for name, value in scope['headers']:
             self[f"{{{name.decode('latin1').lower()}}}i"] = value.decode('latin1')
@@ -180,7 +184,7 @@ class AccessLogAtoms(dict[str, Any]):
             return '-'
 
     @staticmethod
-    def _human_size(size: int, decimal_places: int=2) -> bytes:
+    def _human_size(size: int, decimal_places: int = 2) -> bytes:
         _suffixes = ('bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB')
         order = int(log2(size) / 10) if size else 0
         human_size = f'{size / (1 << (order * 10)):.{decimal_places}f} {_suffixes[order]}'

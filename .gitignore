@@ -30,8 +30,5 @@ workspace.code-workspace
 # Jupyter Notebook
 .ipynb_checkpoints/
 
-# Poetry
-poetry.lock
-
 # Build
 dist

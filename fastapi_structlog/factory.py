@@ -1,4 +1,5 @@
 """Logger factory module."""
+
 from logging import Logger, getLogger
 from typing import Any, Optional, Union
 
@@ -9,9 +10,12 @@ from fastapi_structlog.types_ import typed_property
 
 class LoggerFactory(structlog.stdlib.LoggerFactory):
     """Logger factory."""
-    def __init__(self,
-                 logger: Union[Logger, str],
-                 ignore_frame_names: Optional[list[str]] = None) -> None:
+
+    def __init__(
+        self,
+        logger: Union[Logger, str],
+        ignore_frame_names: Optional[list[str]] = None,
+    ) -> None:
         self.logger = logger
         super().__init__(ignore_frame_names=ignore_frame_names)
 

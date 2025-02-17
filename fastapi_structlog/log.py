@@ -1,4 +1,5 @@
 """Logger configuration module via structlog."""
+
 import logging
 import logging.handlers
 import sys
@@ -22,12 +23,14 @@ from fastapi_structlog.settings import LogSettings, LogType
 
 try:
     from structlog_sentry import SentryProcessor
+
     find_structlog_sentry = True
 except ImportError:
     find_structlog_sentry = False
 
 try:
     import orjson
+
     find_orjson = True
 except ImportError:
     find_orjson = False
@@ -221,6 +224,7 @@ def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter
 
 class HandlerFactory(Generic[T2_]):
     """An abstract factory for creating logging handlers."""
+
     def __init__(
         self,
         handler: type[T2_],
@@ -246,6 +250,7 @@ class HandlerFactory(Generic[T2_]):
 
 class SyslogHandlerFactory(HandlerFactory[logging.handlers.SysLogHandler]):
     """Factory of handlers for syslog."""
+
     def __init__(
         self,
         formatter: Optional[structlog.stdlib.ProcessorFormatter] = None,
@@ -277,6 +282,7 @@ class SyslogHandlerFactory(HandlerFactory[logging.handlers.SysLogHandler]):
 
 class StreamHandlerFactory(HandlerFactory['logging.StreamHandler[TextIO]']):
     """Factory of handlers for console."""
+
     def __init__(
         self,
         formatter: Optional[structlog.stdlib.ProcessorFormatter] = None,
@@ -293,6 +299,7 @@ class StreamHandlerFactory(HandlerFactory['logging.StreamHandler[TextIO]']):
 
 class FileHandlerFactory(HandlerFactory[TimedRotatingFileHandler]):
     """Factory of handlers for file."""
+
     def __init__(
         self,
         formatter: Optional[structlog.stdlib.ProcessorFormatter] = None,
@@ -327,12 +334,15 @@ class FileHandlerFactory(HandlerFactory[TimedRotatingFileHandler]):
         path.parent.mkdir(parents=True, exist_ok=True)
 
         return TimedRotatingFileHandler(
-            filename=path, when=when, backupCount=backup_count,
+            filename=path,
+            when=when,
+            backupCount=backup_count,
         )
 
 
 class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
     """Factory of handlers for database."""
+
     def __init__(
         self,
         formatter: Optional[structlog.stdlib.ProcessorFormatter] = None,
@@ -381,6 +391,7 @@ class DatabaseHandlerFactory(HandlerFactory[DatabaseHandler[T_]]):
 
 class LoggerConfigurator:
     """Logger configuration class."""
+
     def __init__(self, settings: LogSettings) -> None:
         self.settings = settings
 

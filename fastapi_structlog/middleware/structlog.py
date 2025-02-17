@@ -22,6 +22,7 @@ class StructlogMiddleware:
 
     Adds the request ID as the `request_id` key.
     """
+
     def __init__(
         self,
         app: ASGIApp,
@@ -47,5 +48,5 @@ class StructlogMiddleware:
 
         try:
             await self.app(scope, receive, send)
-        except Exception as exc:  # noqa: BLE001
-            self.logger.error(exc, exc_info=exc)
+        except Exception as exc:
+            self.logger.exception(exc, exc_info=exc)  # noqa: TRY401

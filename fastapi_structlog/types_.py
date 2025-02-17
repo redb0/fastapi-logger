@@ -49,6 +49,7 @@ class typed_property(Generic[GetT, SetT]):
     >>> t.value = 4
     >>>     assert t.value == 4
     """
+
     fget: Optional[Callable[[Any], GetT]]
     fset: Optional[Callable[[Any, SetT], None]]
     fdel: Optional[Callable[[Any], None]]

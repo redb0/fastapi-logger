@@ -1,4 +1,5 @@
 """Sentry configuration module."""
+
 import logging
 from collections.abc import Container
 from typing import Optional, Union
@@ -57,10 +58,12 @@ def setup_sentry(  # noqa: PLR0913
         ),
     ]
     if settings_.log_integration:
-        integrations.append(LoggingIntegration(
-            event_level=settings_.log_integration_event_level,
-            level=settings_.log_integration_level,
-        ))
+        integrations.append(
+            LoggingIntegration(
+                event_level=settings_.log_integration_event_level,
+                level=settings_.log_integration_level,
+            ),
+        )
     if settings_.sql_integration:
         integrations.append(SqlalchemyIntegration())
 

@@ -11,6 +11,7 @@ from sqlmodel import Field, SQLModel
 
 class LogModel(SQLModel):
     """Basic model of logging into a database."""
+
     id: Optional[int] = Field(
         title='ID',
         default=None,
