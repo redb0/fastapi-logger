@@ -16,6 +16,7 @@ def hide_query_param(
     replace_pattern: str,
 ) -> Callable[[WrappedLogger, str, EventDict], ProcessorReturnValue]:
     """Hide the password query parameter."""
+
     def hide(
         _: WrappedLogger,
         __: str,
@@ -24,6 +25,7 @@ def hide_query_param(
         for _ in find_by_value(event_dict, value_pattern, replace=replace_pattern):
             pass
         return event_dict
+
     return hide
 
 
@@ -72,6 +74,7 @@ class CallsiteParameterAdderInKey(structlog.processors.CallsiteParameterAdder):
     logging parameters. An additional nesting level for this key
     will be created in `event_dict`.
     """
+
     def __init__(
         self,
         parameters: Collection[CallsiteParameter] = set(CallsiteParameter),
@@ -111,8 +114,12 @@ class ORJSONRenderer(structlog.processors.JSONRenderer):
 
     Decodes a string of bytes received after serialization.
     """
+
     def __call__(  # noqa: D102
-        self, _: WrappedLogger, __: str, event_dict: EventDict,
+        self,
+        _: WrappedLogger,
+        __: str,
+        event_dict: EventDict,
     ) -> Union[str, bytes]:
         result = self._dumps(event_dict, **self._dumps_kw)
         if isinstance(result, bytes):

@@ -31,6 +31,7 @@ class QueueHandler(logging.handlers.QueueHandler):
 
     Removes the conversion to a string in the base class.
     """
+
     def emit(self, record: logging.LogRecord) -> None:  # noqa: D102
         if structlog is not None:
             context = structlog.contextvars.get_contextvars()
@@ -46,6 +47,7 @@ class QueueHandler(logging.handlers.QueueHandler):
 
 class BaseDatabaseHandler(logging.Handler, Generic[T_]):
     """Base class of the handler for logging into the database."""
+
     def __init__(  # noqa: PLR0913
         self,
         db_url: Union[str, URL],

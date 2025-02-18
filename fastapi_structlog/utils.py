@@ -65,4 +65,3 @@ def find_by_value(
                 for d in v:
                     for result in find_by_value(d, key, replace=replace):
                         yield result
-

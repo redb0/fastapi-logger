@@ -1,4 +1,5 @@
 """Sentry configuration."""
+
 import logging
 from enum import Enum
 from typing import Any, Optional
@@ -11,6 +12,7 @@ from fastapi_structlog.utils import check_sub_settings_unset
 
 class Environment(str, Enum):
     """Environment options."""
+
     PROD = 'prod'
     PREVIEW = 'preview'
     TEST = 'test'
