@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-structlog"
-version = "0.6.0"
+version = "0.6.1"
 description = "Structured logs and middleware for fastapi with sentry integration"
 license = { text = "MIT" }
 readme = "README.md"
