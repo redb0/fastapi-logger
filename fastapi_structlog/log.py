@@ -145,6 +145,7 @@ def configure_renderer(
     elif json_logs:
         log_renderer = [structlog.processors.JSONRenderer()]
     elif in_file:
+        # If not json format and write logs to file
         log_renderer = [
             structlog.dev.ConsoleRenderer(
                 colors=False,
@@ -218,6 +219,23 @@ def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter
     log_renderer = configure_renderer(
         json_logs=settings.json_logs,
         event_key=settings.event_key,
+    )
+    return configure_formatter(shared_processors, log_renderer)
+
+
+def base_file_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter:
+    """Create a basic file formatter based on the configuration."""
+    shared_processors = configure_processor(
+        json_logs=settings.json_logs,
+        event_key=settings.event_key,
+        traceback_as_str=settings.traceback_as_str,
+        debug=settings.debug,
+    )
+
+    log_renderer = configure_renderer(
+        json_logs=settings.json_logs,
+        event_key=settings.event_key,
+        in_file=True,
     )
     return configure_formatter(shared_processors, log_renderer)
 
@@ -304,18 +322,6 @@ class FileHandlerFactory(HandlerFactory[TimedRotatingFileHandler]):
         self,
         formatter: Optional[structlog.stdlib.ProcessorFormatter] = None,
     ) -> None:
-        if formatter is None:
-            shared_processors = configure_processor(
-                json_logs=False,
-                event_key='message',
-                traceback_as_str=False,
-            )
-            log_renderer = configure_renderer(
-                json_logs=False,
-                event_key='message',
-                in_file=True,
-            )
-            formatter = configure_formatter(shared_processors, log_renderer)
         super().__init__(TimedRotatingFileHandler, formatter)
 
     def create_handler(
