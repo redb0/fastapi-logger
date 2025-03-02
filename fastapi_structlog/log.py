@@ -306,6 +306,18 @@ class FileHandlerFactory(HandlerFactory[TimedRotatingFileHandler]):
         self,
         formatter: Optional[structlog.stdlib.ProcessorFormatter] = None,
     ) -> None:
+        if formatter is None:
+            shared_processors = configure_processor(
+                json_logs=False,
+                event_key='message',
+                traceback_as_str=False,
+            )
+            log_renderer = configure_renderer(
+                json_logs=False,
+                event_key='message',
+                in_file=True,
+            )
+            formatter = configure_formatter(shared_processors, log_renderer)
         super().__init__(TimedRotatingFileHandler, formatter)
 
     def create_handler(
