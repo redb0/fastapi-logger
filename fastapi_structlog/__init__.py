@@ -20,7 +20,6 @@ from fastapi_structlog.log import (
     LoggerConfigurator,
     SyslogHandlerFactory,
     base_formatter,
-    base_file_formatter,
 )
 from fastapi_structlog.settings import LogSettings, LogType
 
@@ -60,7 +59,7 @@ def setup_logger(  # noqa: PLR0913
     if settings_.filename:
         configurator.add_handler(
             LogType.FILE,
-            FileHandlerFactory(formatter=base_file_formatter(settings_)).create(
+            FileHandlerFactory(formatter=base_formatter(settings_, in_file=True)).create(
                 filename=settings_.filename,
                 when=settings_.when,
                 backup_count=settings_.backup_count,

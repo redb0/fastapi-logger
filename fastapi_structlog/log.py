@@ -207,7 +207,7 @@ def configure_structlog(logger: str, processors: list[Processor]) -> None:
     )
 
 
-def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter:
+def base_formatter(settings: LogSettings, in_file=False) -> structlog.stdlib.ProcessorFormatter:
     """Create a basic formatter based on the configuration."""
     shared_processors = configure_processor(
         json_logs=settings.json_logs,
@@ -219,23 +219,7 @@ def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter
     log_renderer = configure_renderer(
         json_logs=settings.json_logs,
         event_key=settings.event_key,
-    )
-    return configure_formatter(shared_processors, log_renderer)
-
-
-def base_file_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter:
-    """Create a basic file formatter based on the configuration."""
-    shared_processors = configure_processor(
-        json_logs=settings.json_logs,
-        event_key=settings.event_key,
-        traceback_as_str=settings.traceback_as_str,
-        debug=settings.debug,
-    )
-
-    log_renderer = configure_renderer(
-        json_logs=settings.json_logs,
-        event_key=settings.event_key,
-        in_file=True,
+        in_file=in_file,
     )
     return configure_formatter(shared_processors, log_renderer)
 
