@@ -59,7 +59,7 @@ def setup_logger(  # noqa: PLR0913
     if settings_.filename:
         configurator.add_handler(
             LogType.FILE,
-            FileHandlerFactory().create(
+            FileHandlerFactory(formatter=base_formatter(settings_, in_file=True)).create(
                 filename=settings_.filename,
                 when=settings_.when,
                 backup_count=settings_.backup_count,

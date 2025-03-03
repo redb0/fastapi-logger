@@ -145,6 +145,7 @@ def configure_renderer(
     elif json_logs:
         log_renderer = [structlog.processors.JSONRenderer()]
     elif in_file:
+        # If not json format and write logs to file
         log_renderer = [
             structlog.dev.ConsoleRenderer(
                 colors=False,
@@ -206,7 +207,7 @@ def configure_structlog(logger: str, processors: list[Processor]) -> None:
     )
 
 
-def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter:
+def base_formatter(settings: LogSettings, *, in_file=False) -> structlog.stdlib.ProcessorFormatter:
     """Create a basic formatter based on the configuration."""
     shared_processors = configure_processor(
         json_logs=settings.json_logs,
@@ -218,6 +219,7 @@ def base_formatter(settings: LogSettings) -> structlog.stdlib.ProcessorFormatter
     log_renderer = configure_renderer(
         json_logs=settings.json_logs,
         event_key=settings.event_key,
+        in_file=in_file,
     )
     return configure_formatter(shared_processors, log_renderer)
 
