@@ -1,11 +1,14 @@
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI
+from fastapi.middleware import Middleware
 
 import structlog
 import uvicorn
 
 from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
+from fastapi_structlog.middleware.access_log import AccessLogMiddleware
 
 
 class Settings(BaseSettingsModel):
@@ -15,7 +18,27 @@ class Settings(BaseSettingsModel):
 settings = Settings()
 logger = structlog.get_logger()
 
-app = FastAPI(title='Example API', version='1.0.0')
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    queue_listener = setup_logger(settings.log)
+
+    if queue_listener:
+        queue_listener.start()
+
+    yield
+
+    if queue_listener:
+        queue_listener.stop()
+
+
+app = FastAPI(
+    title='Example API',
+    version='1.0.0',
+    lifespan=lifespan,
+    middleware=[Middleware(AccessLogMiddleware)],
+)
+
 
 @app.get('/')
 def warning() -> str:
@@ -46,7 +69,10 @@ def error() -> str:
 
 
 def main() -> None:
-    setup_logger(settings.log)
+    # queue_listener = setup_logger(settings.log)
+
+    # if queue_listener:
+    #     queue_listener.start()
 
     uvicorn.run(
         app,

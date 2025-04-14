@@ -1,3 +1,14 @@
+## 0.7.0 (2025-04-14)
+
+### Feat
+
+- **logs_json**: add `base_file_formatter` and change configuration of `FileHandlerFactory` in `setup_logger`.
+
+### Fix
+
+- **middleware**: sefe receipt of response status
+- **base_formatter**: make `in_file` to keyword-only argument.
+
 ## 0.6.1 (2025-02-18)
 
 ### Refactor
