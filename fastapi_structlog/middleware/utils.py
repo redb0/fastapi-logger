@@ -102,8 +102,8 @@ def find_response_info(
     info: Optional[dict[str, Any]] = None,
 ) -> Optional[dict[str, Any]]:
     """Find information about response."""
-    if info:
+    if info and 'response' in info:
         return {
-            'status_code': info['response']['status'],
+            'status_code': info.get('response', {}).get('status', None),
         }
     return None
