@@ -164,8 +164,8 @@ class LogSettings(BaseModel):
         description='Number of days to store the log entry. Applies only to the Internal type',
     )
 
-    syslog: SysLogSettings
-    db: DBSettings
+    syslog: SysLogSettings = SysLogSettings()
+    db: DBSettings = DBSettings()
 
     _env_prefix: Optional[str] = None
 

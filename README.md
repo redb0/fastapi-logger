@@ -24,18 +24,41 @@ poetry add fastapi-structlog
 
 ## Using logging
 
-To implement logging into the application, it is
-enough to use `init_logging`:
+To implement logging in an application, two things are necessary:
+define the configuration and use `setup_logger`:
 
 ```python
 import structlog
-from fastapi_structlog import init_logger
+from fastapi_structlog import setup_logger
 
-init_logger()
+log_settings = LogSettings(
+    logger='test-log-lib',
+    json_logs=False,
+    debug=True,
+    types=['console'],
+)
+setup_logger(log_settings)
 
 log = structlog.get_logger()
 
 log.info('Hello, World!')
+```
+
+In this case, the entire configuration is determined manually by
+creating an instance of `LogSettings`.
+
+If you want to get the configuration from the environment variables,
+then add `LogSettings` as a nested model in your settings:
+
+```python
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        arbitrary_types_allowed=True,
+        env_ignore_empty=True,
+        env_nested_delimiter='__',
+        extra='ignore',
+    )
+    log: LogSettings
 ```
 
 In this case, the entire configuration is taken from
@@ -46,9 +69,8 @@ example №1 (`docs_src/example_1.py`).
 
 ## Logger configuration
 
-To configure the logger, you need to use `fastapi_structlog.init_logging`,
-which gets the values of the environment variables using `pydantic`.
-You can specify the `env_prefix` argument when using prefixes.
+The logger configuration is implemented using the pydantic model `LogSettings`.
+You can easily integrate it into your application settings model.
 
 Logger configuration parameters:
 
@@ -104,8 +126,12 @@ configuration, for example:
 - ignoring environment variables with empty values
 
 ```python
+from pathlib import Path
+
 import structlog
-from fastapi_structlog import LogSettings, setup_logger, BaseSettingsModel
+from pydantic_settings import SettingsConfigDict
+
+from fastapi_structlog import BaseSettingsModel, LogSettings, setup_logger
 
 logger = structlog.get_logger()
 
@@ -113,18 +139,21 @@ class Settings(BaseSettingsModel):
     log: LogSettings
 
     model_config = SettingsConfigDict(
-        secrets_dir="/run/secrets" if Path("/run/secrets").exists() else None,
+        secrets_dir='/run/secrets' if Path('/run/secrets').exists() else None,
     )
 
 
 def main() -> None:
     settings = Settings()
 
-    setup_logging(**settings.log.model_dump())
+    setup_logger(settings.log)
+
+    logger.info('Start')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+
 ```
 
 For more information about the integration of logging
@@ -134,16 +163,17 @@ settings, see example №4 (`docs_src/example_4.py`).
 
 The use of the library in FasAPI application is for the most part
 similar to that described in the section
-["Logger configuration"](#logger-configuration). To embed it into
-your application, it is enough in the `main` function of the file
-`main.py` (or any other entry point) before starting `uvicorn` (or
-another server), use one of the logger configuration functions. In
-all other places, it is enough to use `structlog.get_logger(log_name)`
-to get the logger. It will be configured according to the settings
-specified when launching the application.
+["Logger configuration"](#logger-configuration). To embed it in your
+application, it is enough in the `main` function of the file `main.py` (or at
+any other entry point) before starting `uvicorn` (or another server) or
+directly in `lifespan`, use the registrar configuration functions. In all other
+places, it is enough to use `structlog.get_logger(log_name)` to get the logger.
+It will be configured according to the settings specified when launching the
+application.
 
 For more information about integrating logging into a FasAPI
-application, see example №2 (`docs_src/example_2.py`).
+application, see example №2 (`docs_src/example_2.py`) or example №8
+(`docs_src/example_8.py`).
 
 ## Using middleware in a FastAPI application
 
@@ -308,10 +338,10 @@ a different database from your main one.
 ```python
 engine = create_async_engine(DB_URL)
 
-queue_listener = init_logger(
-    env_prefix='LOG__',
+queue_listener = setup_logger(
+    settings.log,
     model=Log,
-    db_url=DB_URL,
+    db_url=settings.log.db.make_url(),
 )
 
 logger = structlog.get_logger()
@@ -349,6 +379,8 @@ For other usage docs_src, see `docs_src`:
 - `example_4` - example with the integration of logging settings into the application settings
 - `example_5` - example using middleware
 - `example_6` - example using Sentry and nested calls to other APIs
+- `example_7` - expanding settings
+- `example_8` - logging logs to the database with redefinition of some fields
 
 ## Dependencies
 
