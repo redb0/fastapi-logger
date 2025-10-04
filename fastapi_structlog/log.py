@@ -207,7 +207,11 @@ def configure_structlog(logger: str, processors: list[Processor]) -> None:
     )
 
 
-def base_formatter(settings: LogSettings, *, in_file=False) -> structlog.stdlib.ProcessorFormatter:
+def base_formatter(
+    settings: LogSettings,
+    *,
+    in_file: bool=False,
+) -> structlog.stdlib.ProcessorFormatter:
     """Create a basic formatter based on the configuration."""
     shared_processors = configure_processor(
         json_logs=settings.json_logs,

@@ -2,8 +2,8 @@ from fastapi_structlog.db_handler.handler import BaseDatabaseHandler, DatabaseHa
 from fastapi_structlog.db_handler.model import LogModel
 
 __all__ = (
-    'LogModel',
-    'QueueHandler',
     'BaseDatabaseHandler',
     'DatabaseHandler',
+    'LogModel',
+    'QueueHandler',
 )
