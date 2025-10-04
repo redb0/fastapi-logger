@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -20,7 +21,7 @@ logger = structlog.get_logger()
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(_: FastAPI) -> AsyncGenerator[Any, Any]:
     queue_listener = setup_logger(settings.log)
 
     if queue_listener:

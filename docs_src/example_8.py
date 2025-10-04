@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastapi import FastAPI, Query, Request
 from starlette.middleware import Middleware
@@ -120,9 +120,9 @@ async def test(request: Request) -> str:
 def foo(
     item_id: int,
     item: dict[str, str],
-    bar: str = Query(),
-    password: str = Query(),
-    baz: str = Query(),
+    bar: Annotated[str, Query()],
+    password: Annotated[str, Query()],
+    baz: Annotated[str, Query()],
 ) -> dict[str, str]:
     return item | {'item_id': str(item_id), 'bar': bar, 'password': password, 'baz': baz}
 
