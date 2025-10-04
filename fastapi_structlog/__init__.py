@@ -96,15 +96,15 @@ __version__ = '0.7.0'
 
 
 __all__ = (
-    'LogSettings',
-    'LogType',
-    'setup_logger',
-    'LoggerConfigurator',
+    'BaseSettingsModel',
     'DatabaseHandlerFactory',
-    'SyslogHandlerFactory',
-    'StreamHandlerFactory',
     'FileHandlerFactory',
     'HandlerFactory',
+    'LogSettings',
+    'LogType',
+    'LoggerConfigurator',
+    'StreamHandlerFactory',
+    'SyslogHandlerFactory',
     'base_formatter',
-    'BaseSettingsModel',
+    'setup_logger',
 )

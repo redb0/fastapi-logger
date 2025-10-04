@@ -135,7 +135,7 @@ line-length = 100
 keep-runtime-typing = true
 
 [tool.ruff.lint.per-file-ignores]
-"docs_src/*" = ["D100", "D101", "D103", "T201", "S104"]
+"docs_src/*" = ["D100", "D101", "D103", "T201", "S104", "INP001", "ERA001", "G004"]
 
 
 [tool.ruff.lint.flake8-quotes]
