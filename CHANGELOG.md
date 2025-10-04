@@ -6,7 +6,7 @@
 
 ### Fix
 
-- **middleware**: sefe receipt of response status
+- **middleware**: safe receipt of response status
 - **base_formatter**: make `in_file` to keyword-only argument.
 
 ## 0.6.1 (2025-02-18)
@@ -92,7 +92,7 @@
 
 ### Fix
 
-- **all**: add logger name, level in model, message chenge to json
+- **all**: add logger name, level in model, message change to json
 
 ## 0.3.4 (2024-07-22)
 
