@@ -19,7 +19,7 @@ dependencies = [
     "pydantic-settings (>=2.7.1,<3.0.0)",
     "asgi-correlation-id (>=4.3.4,<5.0.0)",
     "sentry-sdk (>=2.21.0,<3.0.0)",
-    "sqlmodel (>=0.0.22,<0.0.23)"
+    "sqlmodel (>=0.0.22,<0.1.0)"
 ]
 
 
