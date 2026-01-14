@@ -1,3 +1,9 @@
+## 0.7.1 (2026-01-14)
+
+### Fix
+
+- **settings**: add default value for settings submodel
+
 ## 0.7.0 (2025-04-14)
 
 ### Feat

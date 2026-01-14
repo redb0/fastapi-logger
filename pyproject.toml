@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-structlog"
-version = "0.7.0"
+version = "0.7.1"
 description = "Structured logs and middleware for fastapi with sentry integration"
 authors = [{ name = "Vladimir Voronov", email = "voronov.volodya2013@yandex.ru" }]
 requires-python = ">=3.9,<4.0.0"
