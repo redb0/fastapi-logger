@@ -1,6 +1,5 @@
 # Docker
 docker-compose*override.yml
-.poetry_run
 
 # Dotenv (.env)
 .env
